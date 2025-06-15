@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Funcionários{% endblock %}
+
+{% block page_actions %}
+<a href="#" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>
+    Novo Funcionário
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ employees.count }}</h4>
+                        <p class="mb-0">Total de Funcionários</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>8</h4>
+                        <p class="mb-0">Em Serviço</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>5</h4>
+                        <p class="mb-0">Entregadores</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-truck fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>3</h4>
+                        <p class="mb-0">Departamentos</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-building fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" name="search" placeholder="Buscar funcionário..." value="{{ request.GET.search }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="department">
+                    <option value="">Todos os departamentos</option>
+                    <option value="delivery">Entrega</option>
+                    <option value="sales">Vendas</option>
+                    <option value="admin">Administrativo</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status">
+                    <option value="">Todos os status</option>
+                    <option value="active">Ativo</option>
+                    <option value="inactive">Inativo</option>
+                    <option value="on_duty">Em Serviço</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Employees Grid -->
+<div class="row">
+    {% for employee in employees %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="position-relative">
+                        <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-user fa-lg text-white"></i>
+                        </div>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="font-size: 0.6em;">
+                            <i class="fas fa-circle"></i>
+                        </span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-1">{{ employee.user.get_full_name }}</h5>
+                        <p class="text-muted mb-0">{{ employee.departament.name }}</p>
+                        <small class="text-muted">{{ employee.user.email }}</small>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-eye me-2"></i>Ver Perfil
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-edit me-2"></i>Editar
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-truck me-2"></i>Atribuir Entrega
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="row text-center mb-3">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h6 class="text-primary mb-0">12</h6>
+                            <small class="text-muted">Entregas</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h6 class="text-success mb-0">98%</h6>
+                            <small class="text-muted">Taxa Sucesso</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h6 class="text-info mb-0">4.8</h6>
+                        <small class="text-muted">Avaliação</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">Data de Nascimento:</small>
+                        <small>{{ employee.birthdate|date:"d/m/Y" }}</small>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">Tempo na Empresa:</small>
+                        <small>{{ employee.user.date_joined|timesince }}</small>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-success me-1">Ativo</span>
+                        <span class="badge bg-info">Em Serviço</span>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" title="Ver Perfil">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-success" title="Atribuir Entrega">
+                            <i class="fas fa-truck"></i>
+                        </button>
+                        <button class="btn btn-outline-info" title="Contato">
+                            <i class="fas fa-phone"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-user-tie fa-5x text-muted mb-4"></i>
+            <h4 class="text-muted">Nenhum funcionário encontrado</h4>
+            <p class="text-muted">Comece adicionando funcionários ao sistema.</p>
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Adicionar Funcionário
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Departments Overview -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-building me-2"></i>Funcionários por Departamento
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="fas fa-truck fa-2x text-primary mb-2"></i>
+                            <h4>5</h4>
+                            <p class="text-muted mb-0">Entrega</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                            <h4>3</h4>
+                            <p class="text-muted mb-0">Vendas</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="fas fa-cogs fa-2x text-info mb-2"></i>
+                            <h4>2</h4>
+                            <p class="text-muted mb-0">Administrativo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Entregas{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin: 0.25rem 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        
+        /* Toast Container Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+        
+        /* Custom Toast Styles */
+        .toast {
+            min-width: 300px;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+            border: none;
+        }
+        
+        .toast-success {
+            background-color: #d1edff;
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .toast-success .toast-header {
+            background-color: #0d6efd;
+            color: white;
+        }
+        
+        .toast-error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .toast-error .toast-header {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .toast-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .toast-warning .toast-header {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .toast-info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .toast-info .toast-header {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .toast-debug {
+            background-color: #e2e3e5;
+            border-left: 4px solid #6c757d;
+        }
+        
+        .toast-debug .toast-header {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        /* Animation for toast entrance */
+        .toast.show {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Toast icon styles */
+        .toast-icon {
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container">
+        <!-- Toasts will be dynamically added here -->
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">
+                            <i class="fas fa-truck"></i>
+                            DeliverySystem
+                        </h4>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'comercial:product' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'comercial:product_list' %}">
+                                <i class="fas fa-box me-2"></i>
+                                Produtos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'comercial:customer' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'comercial:customer_list' %}">
+                                <i class="fas fa-users me-2"></i>
+                                Clientes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'comercial:order' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'comercial:order_list' %}">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Pedidos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'comercial:delivery' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'comercial:delivery_list' %}">
+                                <i class="fas fa-shipping-fast me-2"></i>
+                                Entregas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'comercial:employee' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'comercial:employee_list' %}">
+                                <i class="fas fa-user-tie me-2"></i>
+                                Funcionários
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'comercial:vehicle' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'comercial:vehicle_list' %}">
+                                <i class="fas fa-car me-2"></i>
+                                Veículos
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <hr class="text-white">
+                    
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i>
+                            {{ user.get_full_name|default:user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                            <li><a class="dropdown-item" href="{% url "auth:profile"%}">Perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Configurações</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{% url 'auth:logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">Sair</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">{% block page_title %}Dashboard{% endblock %}</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        {% block page_actions %}{% endblock %}
+                    </div>
+                </div>
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toast Management System
+        class ToastManager {
+            constructor() {
+                this.container = document.getElementById('toast-container');
+                this.toastCount = 0;
+            }
+            
+            // Get icon for message type
+            getIcon(type) {
+                const icons = {
+                    'success': 'fas fa-check-circle',
+                    'error': 'fas fa-exclamation-circle',
+                    'warning': 'fas fa-exclamation-triangle',
+                    'info': 'fas fa-info-circle',
+                    'debug': 'fas fa-bug'
+                };
+                return icons[type] || 'fas fa-info-circle';
+            }
+            
+            // Get title for message type
+            getTitle(type) {
+                const titles = {
+                    'success': 'Sucesso',
+                    'error': 'Erro',
+                    'warning': 'Atenção',
+                    'info': 'Informação',
+                    'debug': 'Debug'
+                };
+                return titles[type] || 'Notificação';
+            }
+            
+            // Create and show toast
+            showToast(message, type = 'info', duration = 5000) {
+                this.toastCount++;
+                const toastId = `toast-${this.toastCount}`;
+                const icon = this.getIcon(type);
+                const title = this.getTitle(type);
+                
+                const toastHTML = `
+                    <div class="toast toast-${type}" role="alert" aria-live="assertive" aria-atomic="true" id="${toastId}">
+                        <div class="toast-header">
+                            <i class="${icon} toast-icon"></i>
+                            <strong class="me-auto">${title}</strong>
+                            <small class="text-muted">agora</small>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                    </div>
+                `;
+                
+                this.container.insertAdjacentHTML('beforeend', toastHTML);
+                
+                const toastElement = document.getElementById(toastId);
+                const toast = new bootstrap.Toast(toastElement, {
+                    delay: duration,
+                    autohide: true
+                });
+                
+                // Remove toast element after it's hidden
+                toastElement.addEventListener('hidden.bs.toast', () => {
+                    toastElement.remove();
+                });
+                
+                toast.show();
+                
+                return toast;
+            }
+            
+            // Show success toast
+            success(message, duration = 4000) {
+                return this.showToast(message, 'success', duration);
+            }
+            
+            // Show error toast
+            error(message, duration = 6000) {
+                return this.showToast(message, 'error', duration);
+            }
+            
+            // Show warning toast
+            warning(message, duration = 5000) {
+                return this.showToast(message, 'warning', duration);
+            }
+            
+            // Show info toast
+            info(message, duration = 4000) {
+                return this.showToast(message, 'info', duration);
+            }
+            
+            // Show debug toast
+            debug(message, duration = 3000) {
+                return this.showToast(message, 'debug', duration);
+            }
+            
+            // Clear all toasts
+            clearAll() {
+                const toasts = this.container.querySelectorAll('.toast');
+                toasts.forEach(toast => {
+                    const bsToast = bootstrap.Toast.getInstance(toast);
+                    if (bsToast) {
+                        bsToast.hide();
+                    }
+                });
+            }
+        }
+        
+        // Initialize global toast manager
+        window.toastManager = new ToastManager();
+        
+        // Process Django messages on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        toastManager.error('{{ message|escapejs }}');
+                    {% elif message.tags == 'warning' %}
+                        toastManager.warning('{{ message|escapejs }}');
+                    {% elif message.tags == 'success' %}
+                        toastManager.success('{{ message|escapejs }}');
+                    {% elif message.tags == 'info' %}
+                        toastManager.info('{{ message|escapejs }}');
+                    {% elif message.tags == 'debug' %}
+                        toastManager.debug('{{ message|escapejs }}');
+                    {% else %}
+                        toastManager.info('{{ message|escapejs }}');
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        });
+        
+        // Global function for easy access
+        function showToast(message, type = 'info', duration = 5000) {
+            return toastManager.showToast(message, type, duration);
+        }
+        
+        // Convenience functions
+        function showSuccess(message, duration = 4000) {
+            return toastManager.success(message, duration);
+        }
+        
+        function showError(message, duration = 6000) {
+            return toastManager.error(message, duration);
+        }
+        
+        function showWarning(message, duration = 5000) {
+            return toastManager.warning(message, duration);
+        }
+        
+        function showInfo(message, duration = 4000) {
+            return toastManager.info(message, duration);
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido #{{ order.id }} - Sistema de Entregas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-processing { background: #cce5ff; color: #004085; }
+        .status-shipped { background: #d4edda; color: #155724; }
+        .status-delivered { background: #d1ecf1; color: #0c5460; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -19px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #007bff;
+        }
+        .timeline-item.completed::before {
+            background: #28a745;
+        }
+        
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .order-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .info-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            transition: transform 0.2s;
+        }
+        .info-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .print-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+        .print-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="mb-1">
+                            <i class="fas fa-shopping-cart me-2 text-primary"></i>
+                            Pedido #{{ order.id }}
+                        </h2>
+                        <p class="text-muted mb-0">
+                            Criado em {{ order.order_date|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
+                    <div>
+                        <span class="status-badge status-{{ order.status|lower }}">
+                            <i class="fas fa-circle me-1"></i>
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Coluna Principal -->
+            <div class="col-lg-8">
+                <!-- Resumo do Pedido -->
+                <div class="card info-card mb-4">
+                    <div class="card-body order-summary">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <h4 class="mb-1">{{ order.orderitem_set.count }}</h4>
+                                <small>{{ order.orderitem_set.count|pluralize:"Item,Itens" }}</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="mb-1">R$ {{ order.subtotal|floatformat:2 }}</h4>
+                                <small>Subtotal</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="mb-1">R$ {{ order.delivery_fee|floatformat:2 }}</h4>
+                                <small>Taxa Entrega</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="mb-1">R$ {{ order.total_amount|floatformat:2 }}</h4>
+                                <small>Total</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produtos do Pedido -->
+                <div class="card info-card mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-box me-2"></i>
+                            Produtos do Pedido
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th class="text-center">Qtd</th>
+                                        <th class="text-end">Preço Unit.</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.orderitem_set.all %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ item.product.image.url }}"
+                                                     alt="{{ item.product.name }}" 
+                                                     class="product-image me-3">
+                                                <div>
+                                                    <h6 class="mb-1">{{ item.product.name }}</h6>
+                                                    <small class="text-muted">{{ item.product.description|truncatechars:50 }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary">{{ item.quantity }}</span>
+                                        </td>
+                                        <td class="text-end">R$ {{ item.unit_price|floatformat:2 }}</td>
+                                        <td class="text-end">
+                                            <strong>R$ {{ item.subtotal|floatformat:2 }}</strong>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                        <td class="text-end"><strong>R$ {{ order.subtotal|floatformat:2 }}</strong></td>
+                                    </tr>
+                                    {% if order.discount_amount > 0 %}
+                                    <tr>
+                                        <td colspan="3" class="text-end">
+                                            <strong>Desconto ({{ order.discount_percent }}%):</strong>
+                                        </td>
+                                        <td class="text-end text-success">
+                                            <strong>- R$ {{ order.discount_amount|floatformat:2 }}</strong>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>Taxa de Entrega:</strong></td>
+                                        <td class="text-end">
+                                            <strong>
+                                                {% if order.free_delivery %}
+                                                    <span class="text-success">GRÁTIS</span>
+                                                {% else %}
+                                                    R$ {{ order.delivery_fee|floatformat:2 }}
+                                                {% endif %}
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="3" class="text-end"><strong>TOTAL:</strong></td>
+                                        <td class="text-end">
+                                            <h5 class="mb-0 text-success">R$ {{ order.total_amount|floatformat:2 }}</h5>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline do Pedido -->
+                <div class="card info-card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            Histórico do Pedido
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item completed">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">Pedido Criado</h6>
+                                        <p class="text-muted mb-0">Pedido foi criado no sistema</p>
+                                    </div>
+                                    <small class="text-muted">{{ order.created_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </div>
+                            
+                            {% if order.status != 'pending' %}
+                            <div class="timeline-item completed">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">Pedido Confirmado</h6>
+                                        <p class="text-muted mb-0">Pagamento confirmado e pedido em processamento</p>
+                                    </div>
+                                    <small class="text-muted">{{ order.updated_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if order.status == 'shipped' or order.status == 'delivered' %}
+                            <div class="timeline-item completed">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">Pedido Enviado</h6>
+                                        <p class="text-muted mb-0">Pedido saiu para entrega</p>
+                                    </div>
+                                    <small class="text-muted">{{ order.updated_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if order.status == 'delivered' %}
+                            <div class="timeline-item completed">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">Pedido Entregue</h6>
+                                        <p class="text-muted mb-0">Pedido foi entregue com sucesso</p>
+                                    </div>
+                                    <small class="text-muted">{{ order.updated_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if order.status == 'cancelled' %}
+                            <div class="timeline-item">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1 text-danger">Pedido Cancelado</h6>
+                                        <p class="text-muted mb-0">Pedido foi cancelado</p>
+                                    </div>
+                                    <small class="text-muted">{{ order.updated_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Informações do Cliente -->
+                <div class="card info-card mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-user me-2"></i>
+                            Informações do Cliente
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                 style="width: 50px; height: 50px;">
+                                <span class="text-white fw-bold">
+                                    {{ order.customer.user.first_name|first }}{{ order.customer.user.last_name|first }}
+                                </span>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">{{ order.customer.user.get_full_name }}</h6>
+                                <small class="text-muted">Cliente desde {{ order.customer.user.date_joined|date:"M/Y" }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <i class="fas fa-envelope text-muted me-2"></i>
+                            <span>{{ order.customer.user.email }}</span>
+                        </div>
+                        
+                        {% if order.customer.phone %}
+                        <div class="mb-2">
+                            <i class="fas fa-phone text-muted me-2"></i>
+                            <span>{{ order.customer.phone }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if order.customer.address %}
+                        <div class="mb-3">
+                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                            <span>{{ order.customer.address.street }}, {{ order.customer.address.number }}</span>
+                            <br>
+                            <small class="text-muted ms-4">
+                                {{ order.customer.address.city }} - {{ order.customer.address.state }}
+                                <br>CEP: {{ order.customer.address.zip_code }}
+                            </small>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid">
+                            <a href="{% url 'comercial:customer_detail' order.customer.id %}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>Ver Perfil Completo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="card info-card mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-cogs me-2"></i>
+                            Ações
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'comercial:order_edit' order.id %}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-edit me-2"></i>Editar Pedido
+                            </a>
+                            
+                            <button class="btn print-btn" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i>Imprimir Pedido
+                            </button>
+                            
+                            {% if order.status == 'pending' %}
+                            <form method="post" action="{% url 'comercial:order_update_status' order.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="confirmed">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check me-2"></i>Confirmar Pedido
+                                </button>
+                            </form>
+                            {% endif %}
+                            
+                            {% if order.status == 'processing' %}
+                            <button class="btn btn-info" onclick="updateStatus('shipped')">
+                                <i class="fas fa-truck me-2"></i>Marcar como Enviado
+                            </button>
+                            {% endif %}
+                            
+                            {% if order.status == 'shipped' %}
+                            <button class="btn btn-success" onclick="updateStatus('delivered')">
+                                <i class="fas fa-check-circle me-2"></i>Marcar como Entregue
+                            </button>
+                            {% endif %}
+                            
+                            {% if order.status != 'cancelled' and order.status != 'delivered' %}
+                            <button class="btn btn-danger" onclick="updateStatus('cancelled')">
+                                <i class="fas fa-times me-2"></i>Cancelar Pedido
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações Adicionais -->
+                <div class="card info-card">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Informações Adicionais
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h6 class="text-primary">{{ order.orderitem_set.count }}</h6>
+                                <small class="text-muted">Itens</small>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="text-success">{{ order.orderitem_set.all|length }}</h6>
+                                <small class="text-muted">Produtos</small>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        {% if order.notes %}
+                        <div class="mb-3">
+                            <strong>Observações:</strong>
+                            <p class="text-muted mb-0">{{ order.notes }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-2">
+                            <strong>ID do Pedido:</strong>
+                            <span class="text-muted">#{{ order.id }}</span>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <strong>Criado por:</strong>
+                            <span class="text-muted">{{ order.customer.user.get_full_name }}</span>
+                        </div>
+                        
+                        <div>
+                            <strong>Última atualização:</strong>
+                            <span class="text-muted">{{ order.updated_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de Navegação -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'comercial:order_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar para Lista
+                    </a>
+                    
+                    <div>
+                        <a href="{% url 'comercial:order_create' %}" class="btn btn-success me-2">
+                            <i class="fas fa-plus me-2"></i>Novo Pedido
+                        </a>
+                        <a href="{% url 'comercial:customer_detail' order.customer.id %}" class="btn btn-info">
+                            <i class="fas fa-user me-2"></i>Ver Cliente
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        
+
+        // Estilo de impressão
+        window.addEventListener('beforeprint', function() {
+            document.body.classList.add('printing');
+        });
+
+        window.addEventListener('afterprint', function() {
+            document.body.classList.remove('printing');
+        });
+    </script>
+
+    <style media="print">
+        .btn, .card-header, .timeline::before, .timeline-item::before {
+            display: none !important;
+        }
+        .card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+        }
+        .order-summary {
+            background: #f8f9fa !important;
+            color: #000 !important;
+        }
+    </style>
+</body>
+</html>

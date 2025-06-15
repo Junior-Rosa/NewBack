@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+{% if object %}Editar Pedido #{{ object.id }}{% else %}Novo Pedido{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    {% if object %}Editar Pedido{% else %}Criar Novo Pedido{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="orderForm">
+                    {% csrf_token %}
+                    
+                    <!-- Campos ocultos para valores calculados -->
+                    <input type="hidden" name="subtotal" id="hidden-subtotal" value="0">
+                    <input type="hidden" name="discount_amount" id="hidden-discount" value="0">
+                    <input type="hidden" name="delivery_fee" id="hidden-delivery-fee" value="10">
+                    <input type="hidden" name="total_amount" id="hidden-total" value="10">
+                    <input type="hidden" name="discount_percent" id="hidden-discount-percent" value="0">
+                    <input type="hidden" name="free_delivery" id="hidden-free-delivery" value="false">
+                    
+                    <!-- Seleção do Cliente -->
+                    <div class="mb-4">
+                        <label for="{{ form.customer.id_for_label }}" class="form-label">
+                            <i class="fas fa-user me-2"></i>Cliente *
+                        </label>
+                        {{ form.customer }}
+                        {% if form.customer.errors %}
+                            <div class="text-danger small mt-1">{{ form.customer.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Produtos do Pedido -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">
+                                <i class="fas fa-box me-2"></i>Produtos do Pedido
+                            </h6>
+                            <button type="button" class="btn btn-sm btn-success" onclick="addProductRow()">
+                                <i class="fas fa-plus me-1"></i>Adicionar Produto
+                            </button>
+                        </div>
+                        
+                        <div id="products-container">
+                            <div class="product-row border rounded p-3 mb-3">
+                                <div class="row align-items-end">
+                                    <div class="col-md-5">
+                                        <label class="form-label">Produto</label>
+                                        <select class="form-select product-select" name="products[]" required>
+                                            <option value="">Selecione um produto...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Quantidade</label>
+                                        <input type="number" class="form-control quantity-input" name="quantities[]" min="1" value="1" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Preço Unit.</label>
+                                        <input type="text" class="form-control price-display" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Subtotal</label>
+                                        <input type="text" class="form-control subtotal-display" readonly>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeProductRow(this)" title="Remover">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Observações -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-sticky-note me-2"></i>Observações
+                        </label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Observações sobre o pedido..."></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'comercial:order_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            <i class="fas fa-save me-2"></i>
+                            {% if object %}Atualizar Pedido{% else %}Criar Pedido{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Resumo do Pedido -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-calculator me-2"></i>Resumo do Pedido
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span id="order-subtotal" class="fw-bold">R$ 0,00</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Desconto:</span>
+                    <span id="order-discount" class="fw-bold text-danger">R$ 0,00</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Taxa de Entrega:</span>
+                    <span id="delivery-fee" class="fw-bold">R$ 10,00</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>TOTAL:</strong>
+                    <strong id="order-total" class="text-success fs-5">R$ 10,00</strong>
+                </div>
+                
+                <div class="mt-3">
+                    <label class="form-label">Desconto (%)</label>
+                    <input type="number" class="form-control" id="discount-input" min="0" max="100" value="0">
+                </div>
+                
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="free-delivery">
+                        <label class="form-check-label" for="free-delivery">
+                            Entrega gratuita
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informações do Cliente -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-user me-2"></i>Informações do Cliente
+                </h6>
+            </div>
+            <div class="card-body" id="customer-info">
+                <p class="text-muted">Selecione um cliente para ver as informações</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Dados dos produtos (serão carregados do backend)
+    let products = [];
+    let customers = [];
+    
+    // Inicializar quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProducts();
+        loadCustomers();
+        updateOrderTotal();
+        
+        // Event listeners
+        document.getElementById('discount-input').addEventListener('input', updateOrderTotal);
+        document.getElementById('free-delivery').addEventListener('change', updateOrderTotal);
+        
+        // Event listener para seleção de cliente
+        const customerSelect = document.querySelector('select[name="customer"]');
+        if (customerSelect) {
+            customerSelect.addEventListener('change', updateCustomerInfo);
+        }
+        
+        // Inicializar eventos nos produtos existentes
+        document.querySelectorAll('.product-row').forEach(row => {
+            attachProductEvents(row);
+        });
+        
+        // Validação antes do envio
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+            } else {
+                updateHiddenFields();
+            }
+        });
+    });
+
+    function loadProducts() {
+        // Carregar produtos do contexto Django
+        {% if products_json %}
+            products = {{ products_json|safe }};
+        {% else %}
+            products = [];
+        {% endif %}
+        populateProductSelects();
+    }
+
+    function loadCustomers() {
+        // Carregar clientes do contexto Django
+        {% if customers_json %}
+            customers = {{ customers_json|safe }};
+        {% else %}
+            customers = [];
+        {% endif %}
+    }
+    
+    function populateProductSelects() {
+        const selects = document.querySelectorAll('.product-select');
+        selects.forEach(select => {
+            select.innerHTML = '<option value="">Selecione um produto...</option>';
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} - R$ ${product.price.toFixed(2)} (${product.stock} em estoque)`;
+                option.dataset.price = product.price;
+                option.dataset.stock = product.stock;
+                if (product.stock === 0) {
+                    option.disabled = true;
+                    option.textContent += ' - SEM ESTOQUE';
+                }
+                select.appendChild(option);
+            });
+        });
+    }
+    
+    function updateCustomerInfo() {
+        const customerSelect = document.querySelector('select[name="customer"]');
+        const customerInfo = document.getElementById('customer-info');
+        const selectedValue = customerSelect.value;
+        
+        if (selectedValue) {
+            const customer = customers.find(c => c.id == selectedValue);
+            if (customer) {
+                customerInfo.innerHTML = `
+                    <div class="mb-2"><strong>Nome:</strong> ${customer.name}</div>
+                    <div class="mb-2"><strong>Email:</strong> ${customer.email}</div>
+                    <div class="mb-2"><strong>Endereço:</strong> ${customer.address}</div>
+                `;
+            }
+        } else {
+            customerInfo.innerHTML = '<p class="text-muted">Selecione um cliente para ver as informações</p>';
+        }
+    }
+    
+    function addProductRow() {
+        const container = document.getElementById('products-container');
+        const newRow = container.querySelector('.product-row').cloneNode(true);
+        
+        // Limpar valores
+        newRow.querySelectorAll('input, select').forEach(input => {
+            if (input.type === 'number') {
+                input.value = 1;
+            } else if (input.tagName === 'SELECT') {
+                input.selectedIndex = 0;
+            } else {
+                input.value = '';
+            }
+        });
+        
+        container.appendChild(newRow);
+        populateProductSelects();
+        attachProductEvents(newRow);
+        updateOrderTotal();
+    }
+    
+    function removeProductRow(button) {
+        const container = document.getElementById('products-container');
+        if (container.children.length > 1) {
+            button.closest('.product-row').remove();
+            updateOrderTotal();
+        } else {
+            alert('Deve haver pelo menos um produto no pedido.');
+        }
+    }
+    
+    function attachProductEvents(row) {
+        const productSelect = row.querySelector('.product-select');
+        const quantityInput = row.querySelector('.quantity-input');
+        
+        productSelect.addEventListener('change', function() {
+            updateRowTotal(row);
+        });
+        
+        quantityInput.addEventListener('input', function() {
+            updateRowTotal(row);
+        });
+    }
+    
+    function updateRowTotal(row) {
+        const productSelect = row.querySelector('.product-select');
+        const quantityInput = row.querySelector('.quantity-input');
+        const priceDisplay = row.querySelector('.price-display');
+        const subtotalDisplay = row.querySelector('.subtotal-display');
+        
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        if (selectedOption.value) {
+            const price = parseFloat(selectedOption.dataset.price);
+            const quantity = parseInt(quantityInput.value) || 1;
+            const stock = parseInt(selectedOption.dataset.stock);
+            
+            // Verificar estoque
+            if (quantity > stock) {
+                alert(`Quantidade solicitada (${quantity}) excede o estoque disponível (${stock})`);
+                quantityInput.value = stock;
+                return;
+            }
+            
+            const subtotal = price * quantity;
+            
+            priceDisplay.value = `R$ ${price.toFixed(2)}`;
+            subtotalDisplay.value = `R$ ${subtotal.toFixed(2)}`;
+        } else {
+            priceDisplay.value = '';
+            subtotalDisplay.value = '';
+        }
+        
+        updateOrderTotal();
+    }
+    
+    function updateOrderTotal() {
+        let subtotal = 0;
+        
+        document.querySelectorAll('.product-row').forEach(row => {
+            const subtotalDisplay = row.querySelector('.subtotal-display');
+            if (subtotalDisplay.value) {
+                const value = parseFloat(subtotalDisplay.value.replace('R$ ', '').replace(',', '.'));
+                if (!isNaN(value)) {
+                    subtotal += value;
+                }
+            }
+        });
+        
+        const discountPercent = parseFloat(document.getElementById('discount-input').value) || 0;
+        const freeDelivery = document.getElementById('free-delivery').checked;
+        
+        const discount = subtotal * (discountPercent / 100);
+        const deliveryFee = freeDelivery ? 0 : 10;
+        const total = subtotal - discount + deliveryFee;
+        
+        // Atualizar displays
+        document.getElementById('order-subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+        document.getElementById('order-discount').textContent = `R$ ${discount.toFixed(2)}`;
+        document.getElementById('delivery-fee').textContent = `R$ ${deliveryFee.toFixed(2)}`;
+        document.getElementById('order-total').textContent = `R$ ${total.toFixed(2)}`;
+        
+        // Atualizar campos ocultos
+        document.getElementById('hidden-subtotal').value = subtotal.toFixed(2);
+        document.getElementById('hidden-discount').value = discount.toFixed(2);
+        document.getElementById('hidden-delivery-fee').value = deliveryFee.toFixed(2);
+        document.getElementById('hidden-total').value = total.toFixed(2);
+        document.getElementById('hidden-discount-percent').value = discountPercent;
+        document.getElementById('hidden-free-delivery').value = freeDelivery;
+        
+        // Habilitar/desabilitar botão de envio
+        const submitBtn = document.getElementById('submit-btn');
+        if (subtotal > 0) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-secondary');
+            submitBtn.classList.add('btn-primary');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('btn-secondary');
+            submitBtn.classList.remove('btn-primary');
+        }
+    }
+    
+    function updateHiddenFields() {
+        // Garantir que os campos ocultos estão atualizados antes do envio
+        const subtotal = parseFloat(document.getElementById('order-subtotal').textContent.replace('R$ ', '').replace(',', '.'));
+        const discount = parseFloat(document.getElementById('order-discount').textContent.replace('R$ ', '').replace(',', '.'));
+        const deliveryFee = parseFloat(document.getElementById('delivery-fee').textContent.replace('R$ ', '').replace(',', '.'));
+        const total = parseFloat(document.getElementById('order-total').textContent.replace('R$ ', '').replace(',', '.'));
+        
+        document.getElementById('hidden-subtotal').value = subtotal.toFixed(2);
+        document.getElementById('hidden-discount').value = discount.toFixed(2);
+        document.getElementById('hidden-delivery-fee').value = deliveryFee.toFixed(2);
+        document.getElementById('hidden-total').value = total.toFixed(2);
+        
+        console.log('Valores que serão enviados:', {
+            subtotal: subtotal.toFixed(2),
+            discount: discount.toFixed(2),
+            deliveryFee: deliveryFee.toFixed(2),
+            total: total.toFixed(2)
+        });
+    }
+    
+    function validateForm() {
+        const customerSelect = document.querySelector('select[name="customer"]');
+        const productRows = document.querySelectorAll('.product-row');
+        
+        if (!customerSelect.value) {
+            alert('Por favor, selecione um cliente.');
+            customerSelect.focus();
+            return false;
+        }
+        
+        let hasValidProducts = false;
+        for (let row of productRows) {
+            const productSelect = row.querySelector('.product-select');
+            const quantityInput = row.querySelector('.quantity-input');
+            
+            if (productSelect.value && quantityInput.value > 0) {
+                hasValidProducts = true;
+                break;
+            }
+        }
+        
+        if (!hasValidProducts) {
+            alert('Por favor, adicione pelo menos um produto ao pedido.');
+            return false;
+        }
+        
+        return true;
+    }
+</script>
+
+<style>
+.product-row {
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.product-row:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#order-total {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'auth/auth_base.html' %}
+
+{% block title %}Login - Sistema de Entregas{% endblock %}
+
+{% block header_title %}Bem-vindo de volta!{% endblock %}
+{% block header_subtitle %}Faça login para acessar o sistema{% endblock %}
+
+{% block content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label">
+            <i class="fas fa-user me-2"></i>Usuário ou Email
+        </label>
+        {{ form.username }}
+        {% if form.username.errors %}
+            <div class="text-danger small mt-1">
+                {% for error in form.username.errors %}
+                    <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.password.id_for_label }}" class="form-label">
+            <i class="fas fa-lock me-2"></i>Senha
+        </label>
+        {{ form.password }}
+        {% if form.password.errors %}
+            <div class="text-danger small mt-1">
+                {% for error in form.password.errors %}
+                    <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+        <label class="form-check-label" for="remember_me">
+            Lembrar de mim
+        </label>
+    </div>
+    
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div><i class="fas fa-exclamation-triangle me-2"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-sign-in-alt me-2"></i>Entrar
+        </button>
+    </div>
+    
+    <div class="text-center">
+        <a href="#" class="text-decoration-none">Esqueceu sua senha?</a>
+    </div>
+    
+    <div class="divider">
+        <span>ou</span>
+    </div>
+    
+    <div class="text-center">
+        <p class="mb-2">Não tem uma conta?</p>
+        <a href="{% url 'auth:register' %}" class="btn btn-outline-primary">
+            <i class="fas fa-user-plus me-2"></i>Criar Conta
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-focus no primeiro campo
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstInput = document.querySelector('input[type="text"], input[type="email"]');
+        if (firstInput) {
+            firstInput.focus();
+        }
+    });
+    
+    // Mostrar/ocultar senha
+    function togglePassword() {
+        const passwordField = document.getElementById('id_password');
+        const toggleIcon = document.querySelector('.password-toggle i');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+</script>
+{% endblock %}

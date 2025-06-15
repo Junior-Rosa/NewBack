@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Editar Perfil{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Editar Meu Perfil
+                </h5>
+                <p class="mb-0 opacity-75">Atualize suas informações pessoais</p>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate id="profileForm">
+                    {% csrf_token %}
+                    
+                    <!-- Informações Básicas -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-user me-2 text-primary"></i>
+                                Informações Básicas
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    Nome *
+                                </label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.first_name.errors %}
+                                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    Sobrenome *
+                                </label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.last_name.errors %}
+                                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    Email *
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    {{ form.email }}
+                                </div>
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.email.errors %}
+                                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nome de Usuário</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                    <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    O nome de usuário não pode ser alterado
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Alterar Senha -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-lock me-2 text-primary"></i>
+                                Alterar Senha
+                                <small class="text-muted">(opcional)</small>
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.current_password.id_for_label }}" class="form-label">
+                                    Senha Atual
+                                </label>
+                                <div class="input-group">
+                                    {{ form.current_password }}
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('current_password')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                {% if form.current_password.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.current_password.errors %}
+                                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.new_password1.id_for_label }}" class="form-label">
+                                    Nova Senha
+                                </label>
+                                <div class="input-group">
+                                    {{ form.new_password1 }}
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('new_password1')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Mínimo 8 caracteres
+                                </div>
+                                {% if form.new_password1.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.new_password1.errors %}
+                                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.new_password2.id_for_label }}" class="form-label">
+                                    Confirmar Nova Senha
+                                </label>
+                                <div class="input-group">
+                                    {{ form.new_password2 }}
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('new_password2')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                {% if form.new_password2.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.new_password2.errors %}
+                                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações da Conta -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-info-circle me-2 text-primary"></i>
+                                Informações da Conta
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Data de Cadastro</label>
+                                <input type="text" class="form-control" value="{{ user.date_joined|date:'d/m/Y H:i' }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Último Login</label>
+                                <input type="text" class="form-control" value="{{ user.last_login|date:'d/m/Y H:i'|default:'Nunca' }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Status da Conta</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" value="{% if user.is_active %}Ativa{% else %}Inativa{% endif %}" readonly>
+                                    <span class="input-group-text">
+                                        {% if user.is_active %}
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        {% else %}
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de Usuário</label>
+                                <input type="text" class="form-control" value="{% if user.is_staff %}Administrador{% else %}Usuário{% endif %}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Erros gerais do formulário -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <div><i class="fas fa-exclamation-triangle me-2"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Botões de Ação -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'auth:profile' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <div>
+                                    <button type="button" class="btn btn-outline-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                        <i class="fas fa-trash me-2"></i>Excluir Conta
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Exclusão -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Exclusão da Conta
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                </div>
+                
+                <p>Ao excluir sua conta:</p>
+                <ul>
+                    <li>Todos os seus dados pessoais serão removidos</li>
+                    <li>Seu histórico de pedidos será mantido para fins contábeis</li>
+                    <li>Você não poderá mais acessar o sistema</li>
+                    <li>Esta ação é <strong>irreversível</strong></li>
+                </ul>
+                
+                <p>Digite <strong>EXCLUIR</strong> para confirmar:</p>
+                <input type="text" class="form-control" id="confirmDelete" placeholder="Digite EXCLUIR">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                    <i class="fas fa-trash me-2"></i>Excluir Conta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword(fieldName) {
+        const passwordField = document.getElementById('id_' + fieldName);
+        const toggleButton = passwordField.nextElementSibling.querySelector('i');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleButton.classList.remove('fa-eye');
+            toggleButton.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            toggleButton.classList.remove('fa-eye-slash');
+            toggleButton.classList.add('fa-eye');
+        }
+    }
+    
+    // Validação em tempo real das senhas
+    document.addEventListener('DOMContentLoaded', function() {
+        const newPassword1 = document.getElementById('id_new_password1');
+        const newPassword2 = document.getElementById('id_new_password2');
+        
+        function validatePasswords() {
+            if (newPassword1.value && newPassword2.value) {
+                if (newPassword1.value === newPassword2.value) {
+                    newPassword2.classList.remove('is-invalid');
+                    newPassword2.classList.add('is-valid');
+                } else {
+                    newPassword2.classList.remove('is-valid');
+                    newPassword2.classList.add('is-invalid');
+                }
+            }
+        }
+        
+        if (newPassword1 && newPassword2) {
+            newPassword1.addEventListener('input', validatePasswords);
+            newPassword2.addEventListener('input', validatePasswords);
+        }
+        
+        // Validação para exclusão de conta
+        const confirmDeleteInput = document.getElementById('confirmDelete');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        
+        confirmDeleteInput.addEventListener('input', function() {
+            if (this.value === 'EXCLUIR') {
+                confirmDeleteBtn.disabled = false;
+            } else {
+                confirmDeleteBtn.disabled = true;
+            }
+        });
+        
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (confirm('Tem certeza absoluta que deseja excluir sua conta?')) {
+                // Implementar exclusão da conta
+                alert('Funcionalidade de exclusão será implementada');
+            }
+        });
+    });
+    
+    // Validação do formulário
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        const currentPassword = document.getElementById('id_current_password').value;
+        const newPassword1 = document.getElementById('id_new_password1').value;
+        const newPassword2 = document.getElementById('id_new_password2').value;
+        
+        // Se algum campo de senha foi preenchido, validar todos
+        if (currentPassword || newPassword1 || newPassword2) {
+            if (!currentPassword) {
+                alert('Senha atual é obrigatória para alterar a senha.');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!newPassword1) {
+                alert('Nova senha é obrigatória.');
+                e.preventDefault();
+                return;
+            }
+            
+            if (newPassword1 !== newPassword2) {
+                alert('As senhas não coincidem.');
+                e.preventDefault();
+                return;
+            }
+            
+            if (newPassword1.length < 8) {
+                alert('A nova senha deve ter pelo menos 8 caracteres.');
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+</script>
+{% endblock %}

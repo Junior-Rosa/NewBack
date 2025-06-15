@@ -17,6 +17,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -29,6 +30,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# AUTH_USER
+AUTH_USER_MODEL = 'comercial.CustomUser'
+
+LOGIN_URL = 'auth:login'
+LOGOUT_REDIRECT_URL = 'auth:login'
 # Application definition
 
 INSTALLED_APPS = [

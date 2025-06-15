@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ product.name }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{% url 'comercial:product_edit' product.pk %}" class="btn btn-primary">
+        <i class="fas fa-edit me-2"></i>Editar
+    </a>
+    <a href="{% url 'comercial:product_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Voltar
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded shadow-sm" style="max-height: 400px;">
+                {% else %}
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <div class="text-center">
+                            <i class="fas fa-image fa-5x text-muted mb-3"></i>
+                            <p class="text-muted">Nenhuma imagem disponível</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">{{ product.name }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Preço:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        <span class="h4 text-success">R$ {{ product.price }}</span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Estoque:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        <span class="badge {% if product.is_in_stock %}bg-success{% else %}bg-danger{% endif %} fs-6">
+                            {% if product.is_in_stock %}
+                                <i class="fas fa-check me-1"></i>{{ product.stock }} unidades disponíveis
+                            {% else %}
+                                <i class="fas fa-times me-1"></i>Sem estoque
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Status:</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        {% if product.stock > 10 %}
+                            <span class="badge bg-success">Estoque Alto</span>
+                        {% elif product.stock > 0 %}
+                            <span class="badge bg-warning">Estoque Baixo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Sem Estoque</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if product.description %}
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <strong>Descrição:</strong>
+                        <p class="mt-2">{{ product.description|linebreaks }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <hr>
+                
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#updateStockModal">
+                        <i class="fas fa-boxes me-2"></i>Atualizar Estoque
+                    </button>
+                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addToOrderModal">
+                        <i class="fas fa-shopping-cart me-2"></i>Adicionar ao Pedido
+                    </button>
+                    <a href="{% url 'comercial:product_edit' product.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Editar Produto
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estatísticas do Produto -->
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Estatísticas do Produto
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-primary">0</h4>
+                            <p class="text-muted mb-0">Vendas Totais</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-success">R$ 0,00</h4>
+                            <p class="text-muted mb-0">Receita Total</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-info">0</h4>
+                            <p class="text-muted mb-0">Pedidos Pendentes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-warning">{{ product.stock }}</h4>
+                        <p class="text-muted mb-0">Estoque Atual</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Atualizar Estoque -->
+<div class="modal fade" id="updateStockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Atualizar Estoque</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'comercial:update_stock' product.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Estoque atual: <strong>{{ product.stock }} unidades</strong>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Operação</label>
+                        <select class="form-select" name="operation" id="stockOperation">
+                            <option value="add">Adicionar ao estoque</option>
+                            <option value="remove">Remover do estoque</option>
+                            <option value="set">Definir estoque</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number" class="form-control" name="quantity" min="1" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Motivo (opcional)</label>
+                        <textarea class="form-control" name="reason" rows="2" placeholder="Ex: Reposição, Venda, Ajuste de inventário..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Atualizar Estoque</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar ao Pedido -->
+<div class="modal fade" id="addToOrderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar ao Pedido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="#">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+                        <select class="form-select" name="customer" required>
+                            <option value="">Selecione um cliente...</option>
+                            <!-- Aqui você carregaria os clientes via context -->
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number" class="form-control" name="quantity" min="1" max="{{ product.stock }}" value="1" required>
+                        <div class="form-text">Máximo: {{ product.stock }} unidades</div>
+                    </div>
+                    
+                    <div class="alert alert-light">
+                        <div class="d-flex justify-content-between">
+                            <span>Subtotal:</span>
+                            <strong id="subtotal">R$ {{ product.price }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info">Adicionar ao Pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Calcular subtotal
+    document.addEventListener('DOMContentLoaded', function() {
+        const quantityInput = document.querySelector('input[name="quantity"]');
+        const subtotalElement = document.getElementById('subtotal');
+        const price = {{ product.price }};
+        
+        if (quantityInput && subtotalElement) {
+            quantityInput.addEventListener('input', function() {
+                const quantity = parseInt(this.value) || 1;
+                const subtotal = (price * quantity).toFixed(2);
+                subtotalElement.textContent = `R$ ${subtotal}`;
+            });
+        }
+    });
+</script>
+{% endblock %}

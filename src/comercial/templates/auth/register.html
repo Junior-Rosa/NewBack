@@ -1,0 +1,192 @@
+{% extends 'auth/auth_base.html' %}
+
+{% block title %}Registro - Sistema de Entregas{% endblock %}
+
+{% block header_title %}Criar Conta{% endblock %}
+{% block header_subtitle %}Preencha os dados para se cadastrar{% endblock %}
+
+{% block content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                    <i class="fas fa-user me-2"></i>Nome
+                </label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for error in form.first_name.errors %}
+                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                    <i class="fas fa-user me-2"></i>Sobrenome
+                </label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for error in form.last_name.errors %}
+                            <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.email.id_for_label }}" class="form-label">
+            <i class="fas fa-envelope me-2"></i>Email
+        </label>
+        {{ form.email }}
+        {% if form.email.errors %}
+            <div class="text-danger small mt-1">
+                {% for error in form.email.errors %}
+                    <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label">
+            <i class="fas fa-at me-2"></i>Nome de Usuário
+        </label>
+        {{ form.username }}
+        <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>
+            Apenas letras, números e os caracteres @/./+/-/_ são permitidos.
+        </div>
+        {% if form.username.errors %}
+            <div class="text-danger small mt-1">
+                {% for error in form.username.errors %}
+                    <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.password1.id_for_label }}" class="form-label">
+            <i class="fas fa-lock me-2"></i>Senha
+        </label>
+        <div class="input-group">
+            {{ form.password1 }}
+            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password1')">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>
+            Sua senha deve conter pelo menos 8 caracteres.
+        </div>
+        {% if form.password1.errors %}
+            <div class="text-danger small mt-1">
+                {% for error in form.password1.errors %}
+                    <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.password2.id_for_label }}" class="form-label">
+            <i class="fas fa-lock me-2"></i>Confirmar Senha
+        </label>
+        <div class="input-group">
+            {{ form.password2 }}
+            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password2')">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        {% if form.password2.errors %}
+            <div class="text-danger small mt-1">
+                {% for error in form.password2.errors %}
+                    <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="terms" required>
+        <label class="form-check-label" for="terms">
+            Eu concordo com os <a href="#" class="text-decoration-none">Termos de Uso</a> e 
+            <a href="#" class="text-decoration-none">Política de Privacidade</a>
+        </label>
+    </div>
+    
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div><i class="fas fa-exclamation-triangle me-2"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Criar Conta
+        </button>
+    </div>
+    
+    <div class="divider">
+        <span>ou</span>
+    </div>
+    
+    <div class="text-center">
+        <p class="mb-2">Já tem uma conta?</p>
+        <a href="{% url 'auth:login' %}" class="btn btn-outline-primary">
+            <i class="fas fa-sign-in-alt me-2"></i>Fazer Login
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword(fieldName) {
+        const passwordField = document.getElementById('id_' + fieldName);
+        const toggleButton = passwordField.nextElementSibling.querySelector('i');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleButton.classList.remove('fa-eye');
+            toggleButton.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            toggleButton.classList.remove('fa-eye-slash');
+            toggleButton.classList.add('fa-eye');
+        }
+    }
+    
+    // Validação em tempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const password1 = document.getElementById('id_password1');
+        const password2 = document.getElementById('id_password2');
+        
+        function validatePasswords() {
+            if (password1.value && password2.value) {
+                if (password1.value === password2.value) {
+                    password2.classList.remove('is-invalid');
+                    password2.classList.add('is-valid');
+                } else {
+                    password2.classList.remove('is-valid');
+                    password2.classList.add('is-invalid');
+                }
+            }
+        }
+        
+        password1.addEventListener('input', validatePasswords);
+        password2.addEventListener('input', validatePasswords);
+    });
+</script>
+{% endblock %}

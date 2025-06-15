@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Meu Perfil{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Header do Perfil -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        Meu Perfil
+                    </h5>
+                </div>
+     
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px;">
+                            <i class="fas fa-user fa-3x text-white"></i>
+                        </div>
+                        <h4>{{ profile_user.get_full_name|default:profile_user.username }}</h4>
+                        <p class="text-muted">{{ profile_user.email }}</p>
+                        
+                        <div class="d-flex flex-wrap justify-content-center gap-1">
+                            {% if profile_user.is_superuser %}
+                                <span class="badge bg-danger">Super Admin</span>
+                            {% endif %}
+                            {% if profile_user.is_staff %}
+                                <span class="badge bg-warning">Administrador</span>
+                            {% endif %}
+                            {% if customer %}
+                                <span class="badge bg-success">Cliente</span>
+                            {% endif %}
+                            {% if employee %}
+                                <span class="badge bg-info">Funcionário</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Informações Pessoais
+                                </h6>
+                                <hr>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Nome Completo:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ profile_user.get_full_name|default:"<span class='text-muted'>Não informado</span>" }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Email:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ profile_user.email }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Nome de Usuário:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ profile_user.username }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Membro desde:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ profile_user.date_joined|date:"d/m/Y" }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Último Login:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ profile_user.last_login|date:"d/m/Y H:i"|default:"<span class='text-muted'>Nunca</span>" }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {% if customer %}
+                                <h6 class="text-success">
+                                    <i class="fas fa-shopping-cart me-2"></i>
+                                    Informações do Cliente
+                                </h6>
+                                <hr>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Telefone:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ customer.phone|default:"<span class='text-muted'>Não informado</span>" }}
+                                    </div>
+                                </div>
+                                
+                                {% if customer.address %}
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Endereço:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ customer.address.street }}, {{ customer.address.number }}<br>
+                                        {{ customer.address.city }} - {{ customer.address.state }}<br>
+                                        CEP: {{ customer.address.zip_code }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Total de Pedidos:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <span class="badge bg-primary">{{ total_orders }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Total Gasto:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <span class="text-success fw-bold">R$ {{ total_spent|floatformat:2 }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if employee %}
+                                <h6 class="text-info">
+                                    <i class="fas fa-id-badge me-2"></i>
+                                    Informações do Funcionário
+                                </h6>
+                                <hr>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Cargo:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ employee.position|default:"<span class='text-muted'>Não informado</span>" }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Telefone:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ employee.phone|default:"<span class='text-muted'>Não informado</span>" }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-sm-5">
+                                        <strong>Data de Contratação:</strong>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ employee.hire_date|date:"d/m/Y"|default:"<span class='text-muted'>Não informado</span>" }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estatísticas do Cliente -->
+        {% if customer %}
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
+                        <h4 class="text-primary">{{ total_orders }}</h4>
+                        <p class="text-muted mb-0">Total de Pedidos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                        <h4 class="text-warning">{{ pending_orders }}</h4>
+                        <p class="text-muted mb-0">Pedidos Pendentes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                        <h4 class="text-success">{{ completed_orders }}</h4>
+                        <p class="text-muted mb-0">Pedidos Entregues</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-dollar-sign fa-2x text-info mb-2"></i>
+                        <h4 class="text-info">R$ {{ total_spent|floatformat:2 }}</h4>
+                        <p class="text-muted mb-0">Total Gasto</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pedidos Recentes -->
+        {% if recent_orders %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Pedidos Recentes (Últimos 30 dias)
+                </h5>
+                <a href="{% url 'order_list' %}" class="btn btn-outline-primary btn-sm">
+                    Ver Todos
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>
+                                    <strong>#{{ order.id }}</strong>
+                                </td>
+                                <td>{{ order.order_date|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if order.status == 'pending' %}
+                                        <span class="badge bg-warning">Pendente</span>
+                                    {% elif order.status == 'processing' %}
+                                        <span class="badge bg-info">Processando</span>
+                                    {% elif order.status == 'shipped' %}
+                                        <span class="badge bg-primary">Enviado</span>
+                                    {% elif order.status == 'delivered' %}
+                                        <span class="badge bg-success">Entregue</span>
+                                    {% elif order.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong class="text-success">R$ {{ order.total_amount|floatformat:2 }}</strong>
+                                </td>
+                                <td>
+                                    <a href="{% url 'order_detail' order.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+        
+        <!-- Ações Rápidas -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cogs me-2"></i>
+                    Ações Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'auth:profile_edit' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-edit me-2"></i>
+                            Editar Perfil
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                            <i class="fas fa-key me-2"></i>
+                            Alterar Senha
+                        </button>
+                    </div>
+                    {% if customer %}
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'order_list' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Meus Pedidos
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Alterar Senha -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alterar Senha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'auth:password_change' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Senha Atual</label>
+                        <input type="password" class="form-control" name="old_password" required>
+                    </div>
+                    {% if form.old_password.errors %}
+                        <div class="text-danger small">
+                            {{ form.old_password.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label">Nova Senha</label>
+                        <input type="password" class="form-control" name="new_password1" required>
+                        <div class="form-text">
+                            Sua senha deve conter pelo menos 8 caracteres.
+                        </div>
+                        {% if form.new_password1.errors %}
+                            <div class="text-danger small">
+                                {{ form.new_password1.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar Nova Senha</label>
+                        <input type="password" class="form-control" name="new_password2" required>
+                    </div>
+                    {% if form.new_password2.errors %}
+                        <div class="text-danger small">
+                            {{ form.new_password2.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if form.errors %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = new bootstrap.Modal(document.getElementById("changePasswordModal"));
+            modal.show();
+        });
+    </script>
+{% endif %}
+
+<style>
+.avatar-lg {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.btn-outline-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-body .row .col-sm-5 {
+    font-size: 0.9em;
+}
+
+.text-muted {
+    font-style: italic;
+}
+</style>
+{% endblock %}

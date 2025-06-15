@@ -1,0 +1,433 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Cliente: {{ customer.user.get_full_name }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Informações Principais do Cliente -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user me-2"></i>Informações do Cliente
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="avatar-lg mx-auto mb-3 align-center" style="display: flex;justify-content: center;">
+                        <div class="avatar-title bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 24px;">
+                            {{ customer.user.first_name.0|title }}{{ customer.user.last_name.0|title }}
+                        </div>
+                    </div>
+                    <h5 class="mb-1">{{ customer.user.get_full_name|title }}</h5>
+                    <p class="text-muted mb-0">Cliente desde {{ customer.user.date_joined|date:"d/m/Y" }}</p>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-borderless table-sm">
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-envelope text-muted me-2"></i>Email:</td>
+                                <td>{{ customer.user.email }}</td>
+                            </tr>
+                            {% comment %} <tr>
+                                <td><i class="fas fa-phone text-muted me-2"></i>Telefone:</td>
+                                <td>{{ customer.phone|default:"Não informado" }}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-birthday-cake text-muted me-2"></i>Nascimento:</td>
+                                <td>{{ customer.birth_date|date:"d/m/Y"|default:"Não informado" }}</td>
+                            </tr> {% endcomment %}
+                            {% comment %} <tr>
+                                <td><i class="fas fa-venus-mars text-muted me-2"></i>Gênero:</td>
+                                <td>{{ customer.get_gender_display|default:"Não informado" }}</td>
+                            </tr> {% endcomment %}
+                            <tr>
+                                <td><i class="fas fa-id-card text-muted me-2"></i>CPF:</td>
+                                <td>{{ customer.cpf|default:"Não informado" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'comercial:customer_edit' customer.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Editar Cliente
+                    </a>
+                    <a href="{% url 'comercial:order_create' %}?customer={{ customer.pk }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Novo Pedido
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Endereço -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-map-marker-alt me-2"></i>Endereço
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if customer.address %}
+                    <address class="mb-0">
+                        <strong>{{ customer.address.street }}, {{ customer.address.number }}</strong><br>
+                        {% if customer.address.complement %}{{ customer.address.complement }}<br>{% endif %}
+                        {{ customer.address.city }} - {{ customer.address.state }}<br>
+                        {{ customer.address.country }}<br>
+                        CEP: {{ customer.address.zip_code }}
+                    </address>
+                {% else %}
+                    <p class="text-muted mb-0">Endereço não cadastrado</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Estatísticas e Pedidos -->
+    <div class="col-lg-8">
+        <!-- Cards de Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-1">{{ orders.count }}</h3>
+                                <p class="mb-0">Total de Pedidos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-1">{{ pending_orders }}</h3>
+                                <p class="mb-0">Em Andamento</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-clock fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-1">R$ {{ total_spent|floatformat:2 }}</h3>
+                                <p class="mb-0">Total Gasto</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h3 class="mb-1">R$ {{ monthly_total|floatformat:2 }}</h3>
+                                <p class="mb-0">Nos ultimos 30 dias</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráfico de Pedidos por Mês -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Pedidos Confirmados nos Últimos 6 Meses
+                </h6>
+            </div>
+            <div class="card-body">
+                <canvas id="ordersChart" height="100"></canvas>
+            </div>
+        </div>
+        
+        <!-- Lista de Pedidos -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>Histórico de Pedidos
+                </h6>
+                <div class="btn-group btn-group-sm" role="group">
+                    <input type="radio" class="btn-check" name="orderFilter" id="all" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="all">Todos</label>
+                    
+                    <input type="radio" class="btn-check" name="orderFilter" id="pending" autocomplete="off">
+                    <label class="btn btn-outline-warning" for="pending">Pendentes</label>
+                    
+                    <input type="radio" class="btn-check" name="orderFilter" id="completed" autocomplete="off">
+                    <label class="btn btn-outline-success" for="completed">Concluídos</label>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Itens</th>
+                                <th>Total</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr class="order-row" data-status="{{ order.status }}">
+                                <td>
+                                    <strong>#{{ order.id }}</strong>
+                                </td>
+                                <td>{{ order.order_date|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if order.status == 'pending' %}
+                                        <span class="badge bg-warning">Pendente</span>
+                                    {% elif order.status == 'processing' %}
+                                        <span class="badge bg-info">Processando</span>
+                                    {% elif order.status == 'shipped' %}
+                                        <span class="badge bg-primary">Enviado</span>
+                                    {% elif order.status == 'delivered' %}
+                                        <span class="badge bg-success">Entregue</span>
+                                    {% elif order.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelado</span>
+                                    {% elif order.status == 'confirmed'%}
+                                        <span class="badge bg-success">Confirmado</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Desconhecido</span>
+                                    {% endif %}
+                                
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ order.products.count }} item{{  order.products.count|pluralize }}</span>
+                                </td>
+                                <td>
+                                    <strong>R$ {{ order.total_amount|floatformat:2 }}</strong>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'comercial:order_detail' order.pk %}" class="btn btn-outline-primary" title="Ver Detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if order.status == 'pending' %}
+                                        <a href="{% url 'comercial:order_edit' order.pk %}" class="btn btn-outline-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                                        <p>Nenhum pedido encontrado</p>
+                                        <a href="{% url 'order_create' %}?customer={{ customer.pk }}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-2"></i>Criar Primeiro Pedido
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Produtos Mais Comprados -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-star me-2"></i>Produtos Mais Comprados
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for item in top_products %}
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm">
+                                    <div class="avatar-title bg-light text-primary rounded">
+                                        {{ forloop.counter }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">{{ item.product__name }}</h6>
+                                <p class="text-muted mb-0">{{ item.total_quantity }} unidade{{ item.total_quantity|pluralize }} comprada{{ item.total_quantity|pluralize }}</p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <span class="badge bg-primary">R$ {{ item.total_value|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p class="text-muted text-center">Nenhum produto comprado ainda</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.avatar-lg {
+    height: 5rem;
+    width: 5rem;
+}
+
+.avatar-sm {
+    height: 2rem;
+    width: 2rem;
+}
+
+.avatar-title {
+    align-items: center;
+    background-color: #556ee6;
+    color: #fff;
+    display: flex;
+    font-size: 1rem;
+    font-weight: 500;
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+}
+
+.order-row {
+    transition: all 0.3s ease;
+}
+
+.order-row:hover {
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.opacity-75 {
+    opacity: 0.75;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico de pedidos por mês
+    const ctx = document.getElementById('ordersChart').getContext('2d');
+    const ordersChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_labels|safe }},
+            datasets: [{
+                label: 'Pedidos',
+                data: {{ monthly_orders|safe }},
+                borderColor: '#556ee6',
+                backgroundColor: 'rgba(85, 110, 230, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Valor (R$)',
+                data: {{ monthly_values|safe }},
+                borderColor: '#34c38f',
+                backgroundColor: 'rgba(52, 195, 143, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Quantidade de Pedidos'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Valor (R$)'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            }
+        }
+    });
+    
+    // Filtro de pedidos
+    const filterButtons = document.querySelectorAll('input[name="orderFilter"]');
+    const orderRows = document.querySelectorAll('.order-row');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('change', function() {
+            const filter = this.id;
+            
+            orderRows.forEach(row => {
+                const status = row.dataset.status;
+                
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else if (filter === 'pending' && (status === 'pending' || status === 'processing')) {
+                    row.style.display = '';
+                } else if (filter === 'completed' && (status === 'delivered' || status === 'shipped' || status === 'confirmed')) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

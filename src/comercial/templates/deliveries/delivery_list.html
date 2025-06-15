@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Entregas{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="#" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Nova Entrega
+    </a>
+    <a href="#" class="btn btn-outline-secondary">
+        <i class="fas fa-route me-2"></i>Otimizar Rotas
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Status Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ deliveries|length }}</h4>
+                        <p class="mb-0">Total de Entregas</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-truck fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>8</h4>
+                        <p class="mb-0">Em Trânsito</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-shipping-fast fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>15</h4>
+                        <p class="mb-0">Entregues Hoje</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>3</h4>
+                        <p class="mb-0">Atrasadas</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">Todos os status</option>
+                    <option value="pending">Pendente</option>
+                    <option value="in_transit">Em Trânsito</option>
+                    <option value="delivered">Entregue</option>
+                    <option value="failed">Falhou</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Funcionário</label>
+                <select class="form-select" name="employee">
+                    <option value="">Todos os funcionários</option>
+                    <!-- Funcionários serão carregados do context -->
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Veículo</label>
+                <select class="form-select" name="vehicle">
+                    <option value="">Todos os veículos</option>
+                    <!-- Veículos serão carregados do context -->
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Data</label>
+                <input type="date" class="form-control" name="date" value="{{ request.GET.date }}">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter me-2"></i>Filtrar
+                </button>
+                <a href="{% url 'comercial:delivery_list' %}" class="btn btn-outline-secondary ms-2">
+                    <i class="fas fa-times me-2"></i>Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Deliveries List -->
+<div class="row">
+    {% for delivery in deliveries %}
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-0">Entrega #{{ delivery.id }}</h6>
+                    <small class="text-muted">Pedido #{{ delivery.order.id }}</small>
+                </div>
+                <div>
+                    {% if delivery.delivered %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check me-1"></i>Entregue
+                        </span>
+                    {% else %}
+                        <span class="badge bg-warning">
+                            <i class="fas fa-clock me-1"></i>Pendente
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <strong>Cliente:</strong>
+                        <br>{{ delivery.order.customer.user.get_full_name }}
+                        <br><small class="text-muted">{{ delivery.order.customer.user.email }}</small>
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Endereço:</strong>
+                        <br>{{ delivery.order.customer.address.street }}, {{ delivery.order.customer.address.number }}
+                        <br><small class="text-muted">{{ delivery.order.customer.address.city }}, {{ delivery.order.customer.address.state }}</small>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <strong>Funcionário:</strong>
+                        <br>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                <i class="fas fa-user text-white small"></i>
+                            </div>
+                            {{ delivery.employee.user.get_full_name }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Veículo:</strong>
+                        <br>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-car text-primary me-2"></i>
+                            {{ delivery.vehicle.model }} - {{ delivery.vehicle.license_plate }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <strong>Data Prevista:</strong>
+                        <br>{{ delivery.delivery_date|date:"d/m/Y H:i" }}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Status:</strong>
+                        <br>
+                        {% if delivery.delivered %}
+                            <span class="text-success">
+                                <i class="fas fa-check-circle me-1"></i>Entregue
+                            </span>
+                        {% else %}
+                            {% now "Y-m-d H:i" as current_time %}
+                            {% if delivery.delivery_date|date:"Y-m-d H:i" < current_time %}
+                                <span class="text-danger">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Atrasada
+                                </span>
+                            {% else %}
+                                <span class="text-warning">
+                                    <i class="fas fa-clock me-1"></i>Pendente
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">Progresso da Entrega</small>
+                        <small class="text-muted">
+                            {% if delivery.delivered %}100%{% else %}60%{% endif %}
+                        </small>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar {% if delivery.delivered %}bg-success{% else %}bg-warning{% endif %}" 
+                             style="width: {% if delivery.delivered %}100%{% else %}60%{% endif %}"></div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'delivery_detail' delivery.pk %}" class="btn btn-outline-primary" title="Ver Detalhes">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-info" title="Rastrear">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </a>
+                        {% if not delivery.delivered %}
+                        <a href="{% url 'delivery_complete' delivery.pk %}" class="btn btn-outline-success" title="Marcar como Entregue">
+                            <i class="fas fa-check"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-edit me-2"></i>Editar
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-phone me-2"></i>Ligar para Cliente
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-envelope me-2"></i>Enviar Email
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#">
+                                <i class="fas fa-times me-2"></i>Cancelar Entrega
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-truck fa-5x text-muted mb-4"></i>
+            <h4 class="text-muted">Nenhuma entrega encontrada</h4>
+            <p class="text-muted">As entregas aparecerão aqui quando forem criadas.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<nav aria-label="Navegação de páginas" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">Primeira</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        </li>
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh da página a cada 30 segundos para atualizações em tempo real
+    setInterval(function() {
+        // Apenas se não houver modais abertos
+        if (!document.querySelector('.modal.show')) {
+            location.reload();
+        }
+    }, 30000);
+    
+    // Função para atualizar status via AJAX
+    function updateDeliveryStatus(deliveryId, status) {
+        fetch(`/deliveries/${deliveryId}/update-status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({status: status})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+</script>
+{% endblock %}

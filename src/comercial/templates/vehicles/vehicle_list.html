@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Veículos{% endblock %}
+
+{% block page_actions %}
+<a href="#" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>
+    Novo Veículo
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ vehicles.count }}</h4>
+                        <p class="mb-0">Total de Veículos</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-car fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>6</h4>
+                        <p class="mb-0">Disponíveis</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>2</h4>
+                        <p class="mb-0">Em Uso</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-truck fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>1</h4>
+                        <p class="mb-0">Manutenção</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-wrench fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" name="search" placeholder="Buscar por placa ou modelo..." value="{{ request.GET.search }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="year">
+                    <option value="">Todos os anos</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status">
+                    <option value="">Todos os status</option>
+                    <option value="available">Disponível</option>
+                    <option value="in_use">Em Uso</option>
+                    <option value="maintenance">Manutenção</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Vehicles Grid -->
+<div class="row">
+    {% for vehicle in vehicles %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="vehicle-icon bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-car fa-lg text-white"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-1">{{ vehicle.model }}</h5>
+                        <p class="text-muted mb-0">{{ vehicle.license_plate }}</p>
+                        <small class="text-muted">Ano: {{ vehicle.year }}</small>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-eye me-2"></i>Ver Detalhes
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-edit me-2"></i>Editar
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-wrench me-2"></i>Manutenção
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="row text-center mb-3">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h6 class="text-primary mb-0">{{ vehicle.year }}</h6>
+                            <small class="text-muted">Ano</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h6 class="text-success mb-0">15</h6>
+                            <small class="text-muted">Entregas</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h6 class="text-info mb-0">1.250</h6>
+                        <small class="text-muted">KM Rodados</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">Valor do Veículo:</small>
+                        <strong class="text-success">R$ {{ vehicle.value|floatformat:2 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">Última Manutenção:</small>
+                        <small>15/12/2023</small>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Próxima Revisão:</small>
+                        <small class="text-warning">15/03/2024</small>
+                    </div>
+                </div>
+                
+                <!-- Status e Ações -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-success me-1">Disponível</span>
+                        <span class="badge bg-info">Ativo</span>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" title="Ver Detalhes">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-success" title="Atribuir Entrega">
+                            <i class="fas fa-truck"></i>
+                        </button>
+                        <button class="btn btn-outline-warning" title="Manutenção">
+                            <i class="fas fa-wrench"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Barra de Combustível -->
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">Combustível</small>
+                        <small class="text-muted">75%</small>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-car fa-5x text-muted mb-4"></i>
+            <h4 class="text-muted">Nenhum veículo encontrado</h4>
+            <p class="text-muted">Comece adicionando veículos à sua frota.</p>
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Adicionar Veículo
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Fleet Overview -->
+<div class="row mt-5">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Estatísticas da Frota
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-primary">9</h4>
+                            <p class="text-muted mb-0">Total de Veículos</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-success">R$ 450.000</h4>
+                            <p class="text-muted mb-0">Valor da Frota</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border-end">
+                            <h4 class="text-info">12.500</h4>
+                            <p class="text-muted mb-0">KM Total</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-warning">R$ 2.800</h4>
+                        <p class="text-muted mb-0">Custo Mensal</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Alertas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning py-2 mb-2">
+                    <small>
+                        <i class="fas fa-wrench me-2"></i>
+                        <strong>ABC-1234:</strong> Revisão vencida
+                    </small>
+                </div>
+                <div class="alert alert-info py-2 mb-2">
+                    <small>
+                        <i class="fas fa-gas-pump me-2"></i>
+                        <strong>XYZ-5678:</strong> Combustível baixo
+                    </small>
+                </div>
+                <div class="alert alert-danger py-2 mb-0">
+                    <small>
+                        <i class="fas fa-tools me-2"></i>
+                        <strong>DEF-9012:</strong> Em manutenção
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Função para atualizar status do veículo
+    function updateVehicleStatus(vehicleId, status) {
+        fetch(`/vehicles/${vehicleId}/update-status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({status: status})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+    
+    // Tooltip para informações adicionais
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
+{% endblock %}
