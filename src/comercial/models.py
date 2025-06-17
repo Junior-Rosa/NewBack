@@ -241,6 +241,7 @@ class Vehicle(models.Model):
         db_table = 'vehicle'
         verbose_name = _("Veículo")
         verbose_name_plural = _("Veículos")
+        ordering = ['-model']
     
 class Delivery(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name=_("Pedido"))

@@ -43,6 +43,9 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
     template_name = 'orders/order_form.html'
     success_url = reverse_lazy('comercial:order_list')
     
+    
+    
+    
     def form_valid(self, form):
         # Criar o pedido
         order = form.save(commit=False)
