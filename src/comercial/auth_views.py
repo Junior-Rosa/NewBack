@@ -20,7 +20,7 @@ class CustomLoginView(LoginView):
     redirect_authenticated_user = True
     
     def get_success_url(self):
-        return reverse_lazy('comercial:dashboard')
+        return reverse_lazy('dashboard')
     
     def form_valid(self, form):
         messages.success(self.request, f'Bem-vindo, {form.get_user().get_full_name() or form.get_user().username}!')
