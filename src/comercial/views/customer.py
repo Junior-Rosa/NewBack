@@ -74,7 +74,6 @@ class CustomerListView(LoginRequiredMixin, ListView):
         context['active_customers'] = active_customers
         context['recent_customers'] = recent_active_customers
         context['avg_ticket'] = Order.objects.aggregate(Avg('confirmed_total'))['confirmed_total__avg'] or 0
-        print(context)
         
         return context
     
