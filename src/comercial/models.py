@@ -142,9 +142,6 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=[
         ('pending', _('Pendente')),
         ('confirmed', _('Confirmado')),
-        ('processing', 'Processando'),
-        ('shipped', _('Enviado')),
-        ('delivered', _('Entregue')),
         ('cancelled', _('Cancelado')),
     ], default='pending', verbose_name=_("Status"))
     notes = models.TextField(blank=True, null=True, verbose_name=_("Notas"))
