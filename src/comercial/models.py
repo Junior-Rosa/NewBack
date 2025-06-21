@@ -211,6 +211,9 @@ class Department(models.Model):
         db_table = 'department'
         verbose_name = _("Departamento")
         verbose_name_plural = _("Departamentos")
+        
+    def __str__(self):
+        return self.name
     
     
     
@@ -224,6 +227,9 @@ class Employee(models.Model):
         verbose_name = _("Funcionário")
         verbose_name_plural = _("Funcionários")
         ordering = ['user__first_name', 'user__last_name']
+        
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.departament.name}"
 
 class Vehicle(models.Model):
     license_plate = models.CharField(max_length=50, unique=True, verbose_name=_("Placa do Veículo"))
