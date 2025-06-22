@@ -461,7 +461,7 @@ class EmployeeCreateForm(forms.ModelForm):
         })
     )
     class Meta:
-        model: Employee
+        model = Employee
         fields = []
         
     def clean_email(self):
