@@ -143,27 +143,6 @@
                         </div>
                     </div>
 
-                        {% comment %} {% for field in form %}
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ field.id_for_label }}" class="form-label">
-                                        {{ field.label }}{% if field.field.required %} *{% endif %}
-                                    </label>
-                                    {{ field }}
-                                    {% if field.help_text %}
-                                        <div class="form-text">{{ field.help_text }}</div>
-                                    {% endif %}
-                                    {% if field.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in field.errors %}
-                                                <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %} {% endcomment %}
-
                     <!-- Ações -->
                     <div class="row">
                         <div class="col-12">
