@@ -20,7 +20,6 @@ Plataforma de delivery
 * Python 3.10+
 * Django 4.x
 * SQLite3 CLI (`sqlite3`)
-* Docker (opcional para ambiente isolado)
 
 ---
 
@@ -42,41 +41,36 @@ NewBack/
 
 ## 🔧 Como instalar e executar NewBack
 
-1. **Clone o projeto com Git**
+1. **Certifique-se de ter os [pré-requisitos](#️-pré-requisitos) instalados**
+
+2. **Clone o projeto com Git**
 Abra o terminal na pasta que deseja guardar o projeto e execute (é necessário ter o programa *git* instalado no seu dispositivo):
 
    ```bash
    git clone https://github.com/Junior-Rosa/NewBack
    ```
 
-2. **Entre na pasta do projeto**
+3. **Entre na pasta do projeto**
+Digite no terminal:
 
    ```bash
    cd NewBack/
    ```
 
-   Se **não** estiver instalado:
+4. **Crie um ambiente virtual no python (recomendado)**
+No Windows
    
-
-   * **Ubuntu/Debian**:
-
-     ```bash
-     sudo apt install sqlite3
-     ```
-   * **macOS** (com Homebrew):
-
-     ```bash
-     brew install sqlite
-     ```
-   * **Windows**: Baixe em [https://sqlite.org/download.html](https://sqlite.org/download.html) e adicione ao `PATH`.
-
-3. **Exporte a estrutura do banco:**
-
-   ```bash
+   
+   
+   
+   
+   
+   
+   <!-- ```bash
    sqlite3 db.sqlite3 .schema > estrutura.sql
    ```
 
-   Isso irá gerar o arquivo `estrutura.sql` com todos os comandos `CREATE TABLE`, `INDEX`, etc.
+   Isso irá gerar o arquivo `estrutura.sql` com todos os comandos `CREATE TABLE`, `INDEX`, etc. -->
 
 ---
 
