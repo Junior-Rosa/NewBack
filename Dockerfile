@@ -1,8 +1,8 @@
 FROM python:3.11-slim
 
 # Variáveis de ambiente para evitar criação de arquivos .pyc e buffer no stdout/stderr
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Diretório de trabalho
 WORKDIR /app
@@ -17,15 +17,16 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala dependências Python
-COPY requirements.txt /app/
+COPY src/requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o código da aplicação
-COPY . /app/
+COPY src/ /app/
 
 # Coleta arquivos estáticos (ajuste conforme seu projeto)
-RUN python manage.py collectstatic --no-input
-
+RUN python manage.py collectstatic --no-input \
+    && python manage.py makemigrations \
+    && python manage.py migrate --noinput 
 # Copia configuração do Supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
