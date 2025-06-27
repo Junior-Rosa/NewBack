@@ -452,7 +452,8 @@ class EmployeeCreateForm(forms.ModelForm):
         widget=forms.DateInput(attrs={
             'type': 'date',
             'class': 'form-control'
-        })
+        }),
+        input_formats=['%Y-%m-%d']
     )
     departament = forms.ModelChoiceField(  # (Note: same spelling as model)
         queryset=Department.objects.all(),
@@ -462,7 +463,7 @@ class EmployeeCreateForm(forms.ModelForm):
     )
     class Meta:
         model = Employee
-        fields = []
+        fields = ['birthdate', 'departament']
         
     def clean_email(self):
         email = self.cleaned_data.get('email')
