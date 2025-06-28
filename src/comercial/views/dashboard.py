@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
-from ..models import Order, Customer, Product, Delivery
+from ..models import Order, Customer, Product
 
 
 class DashboardView(LoginRequiredMixin, ListView):
@@ -13,6 +13,6 @@ class DashboardView(LoginRequiredMixin, ListView):
         context['total_customers'] = Customer.objects.count()
         context['total_products'] = Product.objects.count()
         context['total_orders'] = Order.objects.count()
-        context['pending_deliveries'] = Delivery.objects.filter(delivered=False).count()
+        # context['pending_deliveries'] = Delivery.objects.filter(delivered=False).count()
         context['recent_orders'] = Order.objects.order_by('-order_date')[:5]
         return context

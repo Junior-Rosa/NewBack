@@ -30,14 +30,14 @@ urlpatterns = [
     path('orders/<int:pk>/update-status/', views.UpdateOrderStatus.as_view(), name='order_update_status'),
     
     # Deliveries
-    path('deliveries/', views.DeliveryListView.as_view(), name='delivery_list'),
-    path('deliveries/<int:pk>/', views.DeliveryDetailView.as_view(), name='delivery_detail'),
-    path('deliveries/<int:pk>/complete/', views.mark_delivery_complete, name='delivery_complete'),
+    # path('deliveries/', views.DeliveryListView.as_view(), name='delivery_list'),
+    # path('deliveries/<int:pk>/', views.DeliveryDetailView.as_view(), name='delivery_detail'),
+    # path('deliveries/<int:pk>/complete/', views.mark_delivery_complete, name='delivery_complete'),
     
     # Employees
     path('employees/', views.EmployeeListView.as_view(), name='employee_list'),
     path('employees/create', views.EmployeeCreateView.as_view(), name='employee_create'),
     
     # Vehicles
-    path('vehicles/', views.VehicleListView.as_view(), name='vehicle_list'),
+    # path('vehicles/', views.VehicleListView.as_view(), name='vehicle_list'),
 ]

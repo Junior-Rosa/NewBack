@@ -97,27 +97,27 @@ class OrderItemForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
         }
 
-class DeliveryForm(forms.ModelForm):
-    class Meta:
-        model = Delivery
-        fields = ['order', 'delivery_date', 'employee', 'vehicle']
-        widgets = {
-            'order': forms.Select(attrs={'class': 'form-control'}),
-            'delivery_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-            'employee': forms.Select(attrs={'class': 'form-control'}),
-            'vehicle': forms.Select(attrs={'class': 'form-control'}),
-        }
+# class DeliveryForm(forms.ModelForm):
+#     class Meta:
+#         model = Delivery
+#         fields = ['order', 'delivery_date', 'employee', 'vehicle']
+#         widgets = {
+#             'order': forms.Select(attrs={'class': 'form-control'}),
+#             'delivery_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+#             'employee': forms.Select(attrs={'class': 'form-control'}),
+#             'vehicle': forms.Select(attrs={'class': 'form-control'}),
+#         }
 
-class VehicleForm(forms.ModelForm):
-    class Meta:
-        model = Vehicle
-        fields = ['license_plate', 'model', 'year', 'value']
-        widgets = {
-            'license_plate': forms.TextInput(attrs={'class': 'form-control'}),
-            'model': forms.TextInput(attrs={'class': 'form-control'}),
-            'year': forms.NumberInput(attrs={'class': 'form-control'}),
-            'value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-        }
+# class VehicleForm(forms.ModelForm):
+#     class Meta:
+#         model = Vehicle
+#         fields = ['license_plate', 'model', 'year', 'value']
+#         widgets = {
+#             'license_plate': forms.TextInput(attrs={'class': 'form-control'}),
+#             'model': forms.TextInput(attrs={'class': 'form-control'}),
+#             'year': forms.NumberInput(attrs={'class': 'form-control'}),
+#             'value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+#         }
 
 class CustomerCreateForm(forms.ModelForm):
     # Campos do usuário
