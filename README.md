@@ -1,5 +1,5 @@
 # 📦 NewBack
-Plataforma de delivery
+Plataforma de gerenciamento de vendas
 
 ![Screenshot](docs/readmeimages/produtos.png)
 
@@ -7,7 +7,7 @@ Plataforma de delivery
 
 ## :truck: O que é NewBack
 
-É uma plataforma para negócios de **delivery**, entre outras coisas ela:
+É uma plataforma para negócios de **gerenciamento de vendas**, entre outras coisas ela:
 
 * Cadastra e gerencia **clientes**
 * Gerencia **produtos** com seus respectivos preços e estoques
