@@ -142,9 +142,6 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=[
         ('pending', _('Pendente')),
         ('confirmed', _('Confirmado')),
-        ('processing', 'Processando'),
-        ('shipped', _('Enviado')),
-        ('delivered', _('Entregue')),
         ('cancelled', _('Cancelado')),
     ], default='pending', verbose_name=_("Status"))
     notes = models.TextField(blank=True, null=True, verbose_name=_("Notas"))
@@ -214,6 +211,9 @@ class Department(models.Model):
         db_table = 'department'
         verbose_name = _("Departamento")
         verbose_name_plural = _("Departamentos")
+        
+    def __str__(self):
+        return self.name
     
     
     
@@ -227,37 +227,40 @@ class Employee(models.Model):
         verbose_name = _("Funcionário")
         verbose_name_plural = _("Funcionários")
         ordering = ['user__first_name', 'user__last_name']
-
-class Vehicle(models.Model):
-    license_plate = models.CharField(max_length=50, unique=True, verbose_name=_("Placa do Veículo"))
-    model = models.CharField(max_length=255, verbose_name=_("Modelo do Veículo"))
-    year = models.PositiveIntegerField(verbose_name=_("Ano do Veículo"))
-    value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_("Valor do Veículo"))
-    
+        
     def __str__(self):
-        return f"{self.model} ({self.year}) - {self.license_plate}"
+        return f"{self.user.get_full_name()} - {self.departament.name}"
 
-    class Meta:
-        db_table = 'vehicle'
-        verbose_name = _("Veículo")
-        verbose_name_plural = _("Veículos")
-        ordering = ['-model']
+# class Vehicle(models.Model):
+#     license_plate = models.CharField(max_length=50, unique=True, verbose_name=_("Placa do Veículo"))
+#     model = models.CharField(max_length=255, verbose_name=_("Modelo do Veículo"))
+#     year = models.PositiveIntegerField(verbose_name=_("Ano do Veículo"))
+#     value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_("Valor do Veículo"))
     
-class Delivery(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name=_("Pedido"))
-    delivery_date = models.DateTimeField(verbose_name=_("Data de Entrega"))
-    delivered = models.BooleanField(default=False, verbose_name=_("Entregue"))
-    employee = models.ForeignKey(Employee, on_delete=models.PROTECT, verbose_name=_("Funcionário Entregador"))
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.PROTECT, verbose_name=_("Veículo Utilizado")) 
+#     def __str__(self):
+#         return f"{self.model} ({self.year}) - {self.license_plate}"
 
-    def __str__(self):
-        return f"Entrega do Pedido {self.order.id} por {self.employee.first_name} {self.employee.last_name}"
+#     class Meta:
+#         db_table = 'vehicle'
+#         verbose_name = _("Veículo")
+#         verbose_name_plural = _("Veículos")
+#         ordering = ['-model']
+    
+# class Delivery(models.Model):
+#     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name=_("Pedido"))
+#     delivery_date = models.DateTimeField(verbose_name=_("Data de Entrega"))
+#     delivered = models.BooleanField(default=False, verbose_name=_("Entregue"))
+#     employee = models.ForeignKey(Employee, on_delete=models.PROTECT, verbose_name=_("Funcionário Entregador"))
+#     vehicle = models.ForeignKey(Vehicle, on_delete=models.PROTECT, verbose_name=_("Veículo Utilizado")) 
 
-    class Meta:
-        db_table = 'delivery'
-        verbose_name = _("Entrega")
-        verbose_name_plural = _("Entregas")
-        ordering = ['-delivery_date']
+#     def __str__(self):
+#         return f"Entrega do Pedido {self.order.id} por {self.employee.first_name} {self.employee.last_name}"
+
+#     class Meta:
+#         db_table = 'delivery'
+#         verbose_name = _("Entrega")
+#         verbose_name_plural = _("Entregas")
+#         ordering = ['-delivery_date']
         
         
 class OrderItem(models.Model):

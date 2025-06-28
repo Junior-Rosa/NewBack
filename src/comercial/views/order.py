@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 import json
 
 
-from ..models import Order, OrderItem, Customer, Product, Delivery
+from ..models import Order, OrderItem, Customer, Product
 from ..forms import OrderForm, OrderUpdateForm
 
 
@@ -33,7 +33,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['order_items'] = OrderItem.objects.filter(order=self.object).select_related('product')
-        context['delivery'] = Delivery.objects.filter(order=self.object).first()
+        # context['delivery'] = Delivery.objects.filter(order=self.object).first()
         return context
 
 

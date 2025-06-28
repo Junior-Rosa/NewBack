@@ -97,27 +97,27 @@ class OrderItemForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
         }
 
-class DeliveryForm(forms.ModelForm):
-    class Meta:
-        model = Delivery
-        fields = ['order', 'delivery_date', 'employee', 'vehicle']
-        widgets = {
-            'order': forms.Select(attrs={'class': 'form-control'}),
-            'delivery_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-            'employee': forms.Select(attrs={'class': 'form-control'}),
-            'vehicle': forms.Select(attrs={'class': 'form-control'}),
-        }
+# class DeliveryForm(forms.ModelForm):
+#     class Meta:
+#         model = Delivery
+#         fields = ['order', 'delivery_date', 'employee', 'vehicle']
+#         widgets = {
+#             'order': forms.Select(attrs={'class': 'form-control'}),
+#             'delivery_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+#             'employee': forms.Select(attrs={'class': 'form-control'}),
+#             'vehicle': forms.Select(attrs={'class': 'form-control'}),
+#         }
 
-class VehicleForm(forms.ModelForm):
-    class Meta:
-        model = Vehicle
-        fields = ['license_plate', 'model', 'year', 'value']
-        widgets = {
-            'license_plate': forms.TextInput(attrs={'class': 'form-control'}),
-            'model': forms.TextInput(attrs={'class': 'form-control'}),
-            'year': forms.NumberInput(attrs={'class': 'form-control'}),
-            'value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-        }
+# class VehicleForm(forms.ModelForm):
+#     class Meta:
+#         model = Vehicle
+#         fields = ['license_plate', 'model', 'year', 'value']
+#         widgets = {
+#             'license_plate': forms.TextInput(attrs={'class': 'form-control'}),
+#             'model': forms.TextInput(attrs={'class': 'form-control'}),
+#             'year': forms.NumberInput(attrs={'class': 'form-control'}),
+#             'value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+#         }
 
 class CustomerCreateForm(forms.ModelForm):
     # Campos do usuário
@@ -414,3 +414,82 @@ class CustomerUpdateForm(forms.ModelForm):
             customer.address.save()
         
         return customer
+
+
+class EmployeeCreateForm(forms.ModelForm):
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nome do funcionario'
+        })
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Sobrenome do Funcionário'
+        })
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'email@exemplo.com'
+        })
+    )
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nome de usuário único'
+        })
+    )
+    birthdate = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control'
+        }),
+        input_formats=['%Y-%m-%d']
+    )
+    departament = forms.ModelChoiceField(  # (Note: same spelling as model)
+        queryset=Department.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
+    class Meta:
+        model = Employee
+        fields = ['birthdate', 'departament']
+        
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError('Este email já está em uso.')
+        return email
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if CustomUser.objects.filter(username=username).exists():
+            raise forms.ValidationError('Este nome de usuário já está em uso.')
+        return username
+
+    def save(self, commit=True):
+        # Create user
+        user = CustomUser.objects.create_user(
+            username=self.cleaned_data['username'],
+            email=self.cleaned_data['email'],
+            first_name=self.cleaned_data['first_name'],
+            last_name=self.cleaned_data['last_name']
+        )
+        
+        # Create employee
+        employee = Employee.objects.create(
+            user=user,
+            birthdate=self.cleaned_data['birthdate'],
+            departament=self.cleaned_data['departament']
+        )
+        return employee

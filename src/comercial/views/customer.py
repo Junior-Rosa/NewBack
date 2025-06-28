@@ -8,7 +8,7 @@ from django.contrib import messages
 from ..utils.math_customer import get_percentage_of_active_customers, confirmed_orders_per_month, top_products_sales
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Q
+from django.db.models import Q, Avg
 
 class CustomerListView(LoginRequiredMixin, ListView):
     model = Customer
@@ -73,6 +73,7 @@ class CustomerListView(LoginRequiredMixin, ListView):
         context['active_customers_percent'] = get_percentage_of_active_customers(total_customers, active_customers)
         context['active_customers'] = active_customers
         context['recent_customers'] = recent_active_customers
+        context['avg_ticket'] = Order.objects.aggregate(Avg('confirmed_total'))['confirmed_total__avg'] or 0
         
         return context
     

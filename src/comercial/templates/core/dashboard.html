@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
+    <div class="col-xl-4 col-md-6 mb-4">
         <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6 mb-4">
+    <div class="col-xl-4 col-md-6 mb-4">
         <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
@@ -40,7 +40,7 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6 mb-4">
+    <div class="col-xl-4 col-md-6 mb-4">
         <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6 mb-4">
+    {% comment %} <div class="col-xl-3 col-md-6 mb-4">
         <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
@@ -74,7 +74,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 </div>
 
 <div class="row">
@@ -153,10 +153,10 @@
                         <i class="fas fa-shopping-cart me-2"></i>
                         Novo Pedido
                     </a>
-                    <a href="{% url 'comercial:delivery_list' %}" class="btn btn-info">
+                    {% comment %} <a href="{% url 'comercial:delivery_list' %}" class="btn btn-info">
                         <i class="fas fa-truck me-2"></i>
                         Ver Entregas
-                    </a>
+                    </a> {% endcomment %}
                     <a href="{% url 'comercial:customer_list' %}" class="btn btn-secondary">
                         <i class="fas fa-users me-2"></i>
                         Ver Clientes

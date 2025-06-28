@@ -86,18 +86,18 @@ class EmployeeAdmin(admin.ModelAdmin):
         return obj.user.email
     get_email.short_description = 'Email'
 
-@admin.register(Vehicle)
-class VehicleAdmin(admin.ModelAdmin):
-    list_display = ['license_plate', 'model', 'year', 'value']
-    list_filter = ['year']
-    search_fields = ['license_plate', 'model']
+# @admin.register(Vehicle)
+# class VehicleAdmin(admin.ModelAdmin):
+#     list_display = ['license_plate', 'model', 'year', 'value']
+#     list_filter = ['year']
+#     search_fields = ['license_plate', 'model']
 
-@admin.register(Delivery)
-class DeliveryAdmin(admin.ModelAdmin):
-    list_display = ['order', 'delivery_date', 'delivered', 'employee', 'vehicle']
-    list_filter = ['delivered', 'delivery_date', 'employee']
-    search_fields = ['order__id', 'employee__user__first_name']
-    list_editable = ['delivered']
+# @admin.register(Delivery)
+# class DeliveryAdmin(admin.ModelAdmin):
+#     list_display = ['order', 'delivery_date', 'delivered', 'employee', 'vehicle']
+#     list_filter = ['delivered', 'delivery_date', 'employee']
+#     search_fields = ['order__id', 'employee__user__first_name']
+#     list_editable = ['delivered']
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
