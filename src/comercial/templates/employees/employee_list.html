@@ -3,7 +3,7 @@
 {% block page_title %}Funcionários{% endblock %}
 
 {% block page_actions %}
-<a href="#" class="btn btn-primary">
+<a href={% url 'comercial:employee_create' %} class="btn btn-primary">
     <i class="fas fa-plus me-2"></i>
     Novo Funcionário
 </a>
@@ -47,7 +47,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4>5</h4>
+                        <h4>{{ total_delivery_employees }}</h4>
                         <p class="mb-0">Entregadores</p>
                     </div>
                     <div class="align-self-center">
@@ -62,7 +62,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4>3</h4>
+                        <h4>{{ total_departments_count }}</h4>
                         <p class="mb-0">Departamentos</p>
                     </div>
                     <div class="align-self-center">
@@ -87,9 +87,12 @@
             <div class="col-md-3">
                 <select class="form-select" name="department">
                     <option value="">Todos os departamentos</option>
-                    <option value="delivery">Entrega</option>
-                    <option value="sales">Vendas</option>
-                    <option value="admin">Administrativo</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.id }}" 
+                                {% if request.GET.department == dept.id|stringformat:"s" %}selected{% endif %}>
+                                {{ dept.name }}
+                            </option>
+                        {% endfor %}
                 </select>
             </div>
             <div class="col-md-3">
@@ -201,7 +204,7 @@
             <i class="fas fa-user-tie fa-5x text-muted mb-4"></i>
             <h4 class="text-muted">Nenhum funcionário encontrado</h4>
             <p class="text-muted">Comece adicionando funcionários ao sistema.</p>
-            <a href="{% url 'employee_create' %}" class="btn btn-primary">
+            <a href="{% url 'comercial:employee_create' %}" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i>Adicionar Funcionário
             </a>
         </div>
