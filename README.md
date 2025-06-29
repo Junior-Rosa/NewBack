@@ -43,14 +43,14 @@ NewBack/
 
 1. Instale o Docker Desktop, pode achar o download [aqui](https://www.docker.com/products/docker-desktop/)
 2. Após instalar, abra o Docker Desktop e aguarde até estar totalmente aberto
-3. Abra Powershell e execute o seguinte comando nele, substituindo ```<TAG>``` pelo tag do conteiner
+3. Abra Powershell e execute o seguinte comando nele, substituindo ```<TAG>``` pelo tag do container
 ```powershell
 docker run -p 8000:8000 juniorrosa/newback:<TAG>
 ```
 
 ### Linux
 1. Primeiro é necessário instalar o Docker, para isso pode seguir o guia em https://docs.docker.com/engine/install/. Lembre de selecionar o seu distro
-2. Após instalar abra o terminal e execute o comando, substituindo `<TAG>` pelo tag do conteiner
+2. Após instalar abra o terminal e execute o comando, substituindo `<TAG>` pelo tag do container
 ```bash
 sudo docker run -p 8000:8000 juniorrosa/newback:<TAG>
 ```
@@ -58,4 +58,4 @@ sudo docker run -p 8000:8000 juniorrosa/newback:<TAG>
 > Se não saber qual é o tag acesse https://hub.docker.com/r/juniorrosa/newback/tags e use o último tag (exemplo: 1.0)
 
 ### Abrindo o projeto
-Depois de executar o conteiner do projeto, pode abrir o frontend dele acessando o site `localhost:8000` em qualquer navegador
+Depois de executar o container do projeto, pode abrir o frontend dele acessando o site `localhost:8000` em qualquer navegador
