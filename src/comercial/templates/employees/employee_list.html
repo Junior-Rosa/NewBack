@@ -27,7 +27,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    {% comment %} <div class="col-md-3">
         <div class="card bg-success text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
     <div class="col-md-3">
         <div class="card bg-info text-white">
             <div class="card-body">
@@ -140,6 +140,9 @@
                             </a></li>
                             <li><a class="dropdown-item" href="{% url 'comercial:employee_edit' employee.id %}">
                                 <i class="fas fa-edit me-2"></i>Editar
+                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'comercial:employee_delete' employee.id %}">
+                                <i class="fas fa-trash-alt me-2"></i>Excluir
                             </a></li>
                         </ul>
                     </div>

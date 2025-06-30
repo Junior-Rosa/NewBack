@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, DetailView
+from django.views.generic import ListView, CreateView, DetailView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from ..models import Employee, Department
@@ -92,3 +92,12 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
         context['title'] = f'Detalhes do Funcionário: {self.object.user.get_full_name()}'
         context['subtitle'] = 'Visualize os detalhes do funcionário'
         return context
+    
+class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
+    model = Employee
+    template_name = 'employees/employee_confirm_delete.html'
+    success_url = reverse_lazy('comercial:employee_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Funcionário deletado com sucesso.')
+        return super().delete(request, *args, **kwargs)
