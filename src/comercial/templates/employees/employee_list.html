@@ -135,17 +135,17 @@
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="{% url 'comercial:employee_detail' employee.id %}">
                                 <i class="fas fa-eye me-2"></i>Ver Perfil
                             </a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="{% url 'comercial:employee_edit' employee.id %}">
                                 <i class="fas fa-edit me-2"></i>Editar
                             </a></li>
                         </ul>
                     </div>
                 </div>
                 
-                <div class="row text-center mb-3">
+                {% comment %} <div class="row text-center mb-3">
                     <div class="col-4">
                         <div class="border-end">
                             <h6 class="text-primary mb-0">12</h6>
@@ -162,7 +162,7 @@
                         <h6 class="text-info mb-0">4.8</h6>
                         <small class="text-muted">Avaliação</small>
                     </div>
-                </div>
+                </div> {% endcomment %}
                 
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-1">
@@ -181,9 +181,9 @@
                         <span class="badge bg-info">Em Serviço</span>
                     </div>
                     <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-primary" title="Ver Perfil">
+                        <a href="{% url 'comercial:employee_detail' employee.pk %}" class="btn btn-outline-primary" title="Ver Perfil">
                             <i class="fas fa-eye"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
