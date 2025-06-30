@@ -1,9 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, DetailView, DeleteView
+from django.views.generic import ListView, CreateView, DetailView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from ..models import Employee, Department
-from ..forms import EmployeeCreateForm
+from ..forms import EmployeeCreateForm, EmployeeUpdateForm
 from django.db.models import Q, Count
 
 class EmployeeListView(LoginRequiredMixin, ListView):
@@ -37,7 +37,7 @@ class EmployeeListView(LoginRequiredMixin, ListView):
         context['total_departments_count'] = Department.objects.count()
         # Pegar departamentos mais a quantidade de funcionários em cada um
         context['departments'] = Department.objects.all().annotate(employee_count=Count('employee'))
-        context['total_delivery_employees'] = Employee.objects.filter(departament__name='Entrega').count()
+        context['total_delivery_employees'] = Employee.objects.filter(department__name='Entrega').count()
         return context
 
 class EmployeeCreateView(LoginRequiredMixin, CreateView):
@@ -61,9 +61,9 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
         context['subtitle'] = 'Preencha os dados para cadastrar um novo funcionario'
         return context
 
-class EmployeeUpdateView(LoginRequiredMixin, CreateView):
+class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
     model = Employee
-    form_class = EmployeeCreateForm
+    form_class = EmployeeUpdateForm
     template_name = 'employees/employee_form.html'
     success_url = reverse_lazy('comercial:employee_list')
     context_object_name = 'employee'

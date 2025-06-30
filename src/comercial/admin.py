@@ -74,8 +74,8 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['get_full_name', 'get_email', 'birthdate', 'departament']
-    list_filter = ['departament', 'birthdate']
+    list_display = ['get_full_name', 'get_email', 'birthdate', 'department']
+    list_filter = ['department', 'birthdate']
     search_fields = ['user__first_name', 'user__last_name', 'user__email']
     
     def get_full_name(self, obj):
