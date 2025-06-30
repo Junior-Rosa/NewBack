@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, DetailView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from ..models import Employee, Department
@@ -80,4 +80,15 @@ class EmployeeUpdateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Editar Funcionário'
         context['subtitle'] = 'Atualize os dados do funcionario'
+        return context
+
+class EmployeeDetailView(LoginRequiredMixin, DetailView):
+    model = Employee
+    template_name = 'employees/employee_detail.html'
+    context_object_name = 'employee'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Detalhes do Funcionário: {self.object.user.get_full_name()}'
+        context['subtitle'] = 'Visualize os detalhes do funcionário'
         return context
