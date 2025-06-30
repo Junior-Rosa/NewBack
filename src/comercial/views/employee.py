@@ -60,3 +60,24 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
         context['title'] = 'Novo Funcionário'
         context['subtitle'] = 'Preencha os dados para cadastrar um novo funcionario'
         return context
+
+class EmployeeUpdateView(LoginRequiredMixin, CreateView):
+    model = Employee
+    form_class = EmployeeCreateForm
+    template_name = 'employees/employee_form.html'
+    success_url = reverse_lazy('comercial:employee_list')
+    context_object_name = 'employee'
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Funcionario atualizado com sucesso!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Erro ao atualizar funcionario. Verifique os dados informados.')
+        return super().form_invalid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Editar Funcionário'
+        context['subtitle'] = 'Atualize os dados do funcionario'
+        return context
