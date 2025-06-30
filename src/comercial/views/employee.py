@@ -95,7 +95,7 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
     
 class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
     model = Employee
-    template_name = 'employees/employee_confirm_delete.html'
+    template_name = 'employees/employee_delete_confirm.html'
     success_url = reverse_lazy('comercial:employee_list')
 
     def delete(self, request, *args, **kwargs):
