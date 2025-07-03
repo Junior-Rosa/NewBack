@@ -125,16 +125,16 @@
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="{{ form.departament.id_for_label }}" class="form-label">
+                                <label for="{{ form.department.id_for_label }}" class="form-label">
                                     Departamento *
                                 </label>
-                                {{ form.departament }}
-                                {% if form.departament.help_text %}
-                                    <div class="form-text">{{ form.departament.help_text }}</div>
+                                {{ form.department }}
+                                {% if form.department.help_text %}
+                                    <div class="form-text">{{ form.department.help_text }}</div>
                                 {% endif %}
-                                {% if form.departament.errors %}
+                                {% if form.department.errors %}
                                     <div class="text-danger small mt-1">
-                                        {% for error in form.departament.errors %}
+                                        {% for error in form.department.errors %}
                                             <div><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
                                         {% endfor %}
                                     </div>

@@ -3,7 +3,7 @@
 {% block page_title %}Funcionários{% endblock %}
 
 {% block page_actions %}
-<a href="#" class="btn btn-primary">
+<a href={% url 'comercial:employee_create' %} class="btn btn-primary">
     <i class="fas fa-plus me-2"></i>
     Novo Funcionário
 </a>
@@ -27,7 +27,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    {% comment %} <div class="col-md-3">
         <div class="card bg-success text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
@@ -41,13 +41,13 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
     <div class="col-md-3">
         <div class="card bg-info text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4>5</h4>
+                        <h4>{{ total_delivery_employees }}</h4>
                         <p class="mb-0">Entregadores</p>
                     </div>
                     <div class="align-self-center">
@@ -62,7 +62,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4>3</h4>
+                        <h4>{{ total_departments_count }}</h4>
                         <p class="mb-0">Departamentos</p>
                     </div>
                     <div class="align-self-center">
@@ -87,9 +87,12 @@
             <div class="col-md-3">
                 <select class="form-select" name="department">
                     <option value="">Todos os departamentos</option>
-                    <option value="delivery">Entrega</option>
-                    <option value="sales">Vendas</option>
-                    <option value="admin">Administrativo</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.id }}" 
+                                {% if request.GET.department == dept.id|stringformat:"s" %}selected{% endif %}>
+                                {{ dept.name }}
+                            </option>
+                        {% endfor %}
                 </select>
             </div>
             <div class="col-md-3">
@@ -124,7 +127,7 @@
                     </div>
                     <div class="flex-grow-1">
                         <h5 class="card-title mb-1">{{ employee.user.get_full_name }}</h5>
-                        <p class="text-muted mb-0">{{ employee.departament.name }}</p>
+                        <p class="text-muted mb-0">{{ employee.department.name }}</p>
                         <small class="text-muted">{{ employee.user.email }}</small>
                     </div>
                     <div class="dropdown">
@@ -132,20 +135,20 @@
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="{% url 'comercial:employee_detail' employee.id %}">
                                 <i class="fas fa-eye me-2"></i>Ver Perfil
                             </a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="{% url 'comercial:employee_edit' employee.id %}">
                                 <i class="fas fa-edit me-2"></i>Editar
                             </a></li>
-                            <li><a class="dropdown-item" href="#">
-                                <i class="fas fa-truck me-2"></i>Atribuir Entrega
+                            <li><a class="dropdown-item text-danger" href="{% url 'comercial:employee_delete' employee.id %}">
+                                <i class="fas fa-trash-alt me-2"></i>Excluir
                             </a></li>
                         </ul>
                     </div>
                 </div>
                 
-                <div class="row text-center mb-3">
+                {% comment %} <div class="row text-center mb-3">
                     <div class="col-4">
                         <div class="border-end">
                             <h6 class="text-primary mb-0">12</h6>
@@ -162,7 +165,7 @@
                         <h6 class="text-info mb-0">4.8</h6>
                         <small class="text-muted">Avaliação</small>
                     </div>
-                </div>
+                </div> {% endcomment %}
                 
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-1">
@@ -181,15 +184,9 @@
                         <span class="badge bg-info">Em Serviço</span>
                     </div>
                     <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-primary" title="Ver Perfil">
+                        <a href="{% url 'comercial:employee_detail' employee.pk %}" class="btn btn-outline-primary" title="Ver Perfil">
                             <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn btn-outline-success" title="Atribuir Entrega">
-                            <i class="fas fa-truck"></i>
-                        </button>
-                        <button class="btn btn-outline-info" title="Contato">
-                            <i class="fas fa-phone"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -201,7 +198,7 @@
             <i class="fas fa-user-tie fa-5x text-muted mb-4"></i>
             <h4 class="text-muted">Nenhum funcionário encontrado</h4>
             <p class="text-muted">Comece adicionando funcionários ao sistema.</p>
-            <a href="{% url 'employee_create' %}" class="btn btn-primary">
+            <a href="{% url 'comercial:employee_create' %}" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i>Adicionar Funcionário
             </a>
         </div>
@@ -220,27 +217,18 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    {% for department in departments %}
+                    <div class="col-md-4 mb-3">
                         <div class="text-center p-3 border rounded">
-                            <i class="fas fa-truck fa-2x text-primary mb-2"></i>
-                            <h4>5</h4>
-                            <p class="text-muted mb-0">Entrega</p>
+                            <h4>{{ department.employee_count }}</h4>
+                            <p class="text-muted mb-0">{{ department.name }}</p>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="text-center p-3 border rounded">
-                            <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
-                            <h4>3</h4>
-                            <p class="text-muted mb-0">Vendas</p>
-                        </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p class="text-muted text-center">Nenhum departamento encontrado.</p>
                     </div>
-                    <div class="col-md-4">
-                        <div class="text-center p-3 border rounded">
-                            <i class="fas fa-cogs fa-2x text-info mb-2"></i>
-                            <h4>2</h4>
-                            <p class="text-muted mb-0">Administrativo</p>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
