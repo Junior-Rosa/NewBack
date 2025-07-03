@@ -455,7 +455,7 @@ class EmployeeCreateForm(forms.ModelForm):
         }),
         input_formats=['%Y-%m-%d']
     )
-    departament = forms.ModelChoiceField(  # (Note: same spelling as model)
+    department = forms.ModelChoiceField(  # (Note: same spelling as model)
         queryset=Department.objects.all(),
         widget=forms.Select(attrs={
             'class': 'form-control'
@@ -463,7 +463,7 @@ class EmployeeCreateForm(forms.ModelForm):
     )
     class Meta:
         model = Employee
-        fields = ['birthdate', 'departament']
+        fields = ['birthdate', 'department']
         
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -490,6 +490,102 @@ class EmployeeCreateForm(forms.ModelForm):
         employee = Employee.objects.create(
             user=user,
             birthdate=self.cleaned_data['birthdate'],
-            departament=self.cleaned_data['departament']
+            department=self.cleaned_data['department']
         )
+        return employee
+    
+class EmployeeUpdateForm(forms.ModelForm):
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nome do funcionario'
+        })
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Sobrenome do Funcionário'
+        })
+    )
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nome de usuário único'
+        })
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'email@exemplo.com'
+        })
+    )
+    
+    birthdate = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control'
+        }),
+        input_formats=['%Y-%m-%d']
+    )
+    
+    department = forms.ModelChoiceField(  # (Note: same spelling as model)
+        queryset=Department.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
+    
+    class Meta:
+        model = Employee
+        fields = []
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Se estiver editando um funcionário existente
+        if self.instance and self.instance.pk:
+            self.fields['first_name'].initial = self.instance.user.first_name
+            self.fields['last_name'].initial = self.instance.user.last_name
+            self.fields['email'].initial = self.instance.user.email
+            self.fields['username'].initial = self.instance.user.username
+            self.fields['birthdate'].initial = self.instance.birthdate
+            self.fields['department'].initial = self.instance.department
+        
+        print("INSTÂNCIA:", self.instance)
+        print("USER:", self.instance.user)
+        print("DEPARTAMENTO:", self.instance.department)
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if self.instance and self.instance.pk:
+            # Permitir o mesmo email se for o mesmo usuário
+            if User.objects.filter(email=email).exclude(pk=self.instance.user.pk).exists():
+                raise forms.ValidationError('Este email já está em uso.')
+        else:
+            if User.objects.filter(email=email).exists():
+                raise forms.ValidationError('Este email já está em uso.')
+        return email
+
+    def save(self, commit=True):
+        employee = self.instance
+        user = employee.user
+        
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.email = self.cleaned_data['email']
+        user.username = self.cleaned_data['username']
+        if commit:
+            user.save()
+            
+        employee.department = self.cleaned_data['department']
+        employee.birthdate = self.cleaned_data['birthdate']
+        if commit:
+            employee.save()
+            
         return employee

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-warning">
+        <h4>Confirmação de Exclusão</h4>
+        <p>Tem certeza que deseja excluir o funcionário <strong>{{ object.user.get_full_name }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <a href="{% url 'comercial:employee_list' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-danger">Excluir</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

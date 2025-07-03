@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Detalhes do Funcionário{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    {{ employee.user.get_full_name }}
+                </h5>
+                <p class="mb-0 opacity-75">Informações detalhadas do funcionário</p>
+            </div>
+            <div class="card-body">
+                <!-- Dados Pessoais -->
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="fas fa-id-card me-2 text-primary"></i>
+                    Dados Pessoais
+                </h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Nome:</strong> {{ employee.user.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Sobrenome:</strong> {{ employee.user.last_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Usuário:</strong> {{ employee.user.username }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Email:</strong> {{ employee.user.email }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Data de nascimento:</strong> {{ employee.birthdate|date:"d/m/Y" }}
+                    </div>
+                </div>
+
+                <!-- Departamento -->
+                <h6 class="border-bottom pb-2 mb-3 mt-4">
+                    <i class="fas fa-building me-2 text-primary"></i>
+                    Departamento
+                </h6>
+                <div class="mb-3">
+                    <strong>Nome do departamento:</strong> {{ employee.department.name }}
+                </div>
+
+                <!-- Ações -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'comercial:employee_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar à lista
+                    </a>
+                    <a href="{% url 'comercial:employee_edit' employee.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Editar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
