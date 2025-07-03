@@ -215,12 +215,13 @@ class Department(models.Model):
     def __str__(self):
         return self.name
     
-    
+    #employee.deparment.name
+    #department.employees.all()
     
 class Employee(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='employee', verbose_name=_("Usuário"))
     birthdate = models.DateField(verbose_name=_("Data de Nascimento"))
-    department = models.ForeignKey(Department, on_delete=models.PROTECT, verbose_name=_("Departamento"))
+    department = models.ForeignKey(Department, on_delete=models.PROTECT, verbose_name=_("Departamento"), related_name='employees')
     
     class Meta:
         db_table = 'employee'

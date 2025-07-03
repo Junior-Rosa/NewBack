@@ -5,6 +5,8 @@ from django.contrib import messages
 from ..models import Employee, Department
 from ..forms import EmployeeCreateForm, EmployeeUpdateForm
 from django.db.models import Q, Count
+from django.db import connection
+
 
 class EmployeeListView(LoginRequiredMixin, ListView):
     model = Employee
@@ -36,8 +38,13 @@ class EmployeeListView(LoginRequiredMixin, ListView):
         context['subtitle'] = 'Gerencie os funcionários da empresa'
         context['total_departments_count'] = Department.objects.count()
         # Pegar departamentos mais a quantidade de funcionários em cada um
-        context['departments'] = Department.objects.all().annotate(employee_count=Count('employee'))
-        context['total_delivery_employees'] = Employee.objects.filter(department__name='Entrega').count()
+        context['departments'] = Department.objects.all().annotate(employee_count=Count('employees'))
+        # context['total_delivery_employees'] = Employee.objects.filter(department__name='Entrega').count()
+        
+        for query in connection.queries:
+            print(query['sql'])
+        
+        
         return context
 
 class EmployeeCreateView(LoginRequiredMixin, CreateView):
@@ -59,6 +66,9 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Novo Funcionário'
         context['subtitle'] = 'Preencha os dados para cadastrar um novo funcionario'
+        
+        for query in connection.queries:
+            print(query['sql'])
         return context
 
 class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
@@ -80,6 +90,8 @@ class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Editar Funcionário'
         context['subtitle'] = 'Atualize os dados do funcionario'
+        for query in connection.queries:
+            print(query['sql'])
         return context
 
 class EmployeeDetailView(LoginRequiredMixin, DetailView):
@@ -91,6 +103,8 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['title'] = f'Detalhes do Funcionário: {self.object.user.get_full_name()}'
         context['subtitle'] = 'Visualize os detalhes do funcionário'
+        for query in connection.queries:
+            print(query['sql'])
         return context
     
 class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
@@ -99,5 +113,10 @@ class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('comercial:employee_list')
 
     def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Funcionário deletado com sucesso.')
+        # messages.success(request, 'Funcionário deletado com sucesso.')
         return super().delete(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Funcionário excluido com sucesso!')
+        return super().form_valid(form)
+    
