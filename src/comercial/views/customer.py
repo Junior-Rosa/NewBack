@@ -9,6 +9,8 @@ from ..utils.math_customer import get_percentage_of_active_customers, confirmed_
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q, Avg
+from django.db import connection
+
 
 class CustomerListView(LoginRequiredMixin, ListView):
     model = Customer
@@ -20,7 +22,6 @@ class CustomerListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = Customer.objects.all()
 
-        # Busca genérica (ex: nome ou email do usuário)
         search = self.request.GET.get('search')
         if search:
             queryset = queryset.filter(
@@ -41,6 +42,8 @@ class CustomerListView(LoginRequiredMixin, ListView):
         elif status == 'inactive':
             queryset = queryset.filter(active=False)
 
+        
+        
         return queryset
     
     
@@ -75,6 +78,8 @@ class CustomerListView(LoginRequiredMixin, ListView):
         context['recent_customers'] = recent_active_customers
         context['avg_ticket'] = Order.objects.aggregate(Avg('confirmed_total'))['confirmed_total__avg'] or 0
         
+        for query in connection.queries:
+            print(query['sql'])
         return context
     
     
@@ -92,6 +97,10 @@ class CustomerDetailView(LoginRequiredMixin, DetailView):
         context['monthly_total'] = sum(order.subtotal for order in context['orders'] if order.order_date >= timezone.now() - timedelta(days=30))
         context.update(confirmed_orders_per_month(Order, self.object))
         context['top_products'] = top_products_sales(OrderItem, self.object)
+        
+        for query in connection.queries:
+            print(query['sql'])
+        
         return context
 
 class CustomerCreateView(LoginRequiredMixin, CreateView):
@@ -112,6 +121,10 @@ class CustomerCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Novo Cliente'
         context['subtitle'] = 'Preencha os dados para cadastrar um novo cliente'
+        
+        for query in connection.queries:
+            print(query['sql'])
+        
         return context
 
 class CustomerUpdateView(LoginRequiredMixin, UpdateView):
@@ -127,6 +140,10 @@ class CustomerUpdateView(LoginRequiredMixin, UpdateView):
         context['title'] = 'Editar Cliente'
         context['subtitle'] = f'Editando dados de {self.object.user.get_full_name()}'
         context['is_edit'] = True
+        
+        for query in connection.queries:
+            print(query['sql'])
+        
         return context
     
     def form_valid(self, form):
