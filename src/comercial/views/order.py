@@ -7,6 +7,7 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.db import connection
 
 import json
 
@@ -34,6 +35,8 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['order_items'] = OrderItem.objects.filter(order=self.object).select_related('product')
         # context['delivery'] = Delivery.objects.filter(order=self.object).first()
+        for query in connection.queries:
+            print(query['sql'])
         return context
 
 
@@ -127,6 +130,8 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
         context['customers'] = Customer.objects.select_related('user', 'address').all()
         context['products'] = Product.objects.filter(stock__gt=0)
         
+        for query in connection.queries:
+            print(query['sql'])
         return context
 
 
@@ -180,6 +185,8 @@ class OrderUpdateView(LoginRequiredMixin, UpdateView):
         context['existing_items'] = json.dumps(existing_items)
         context['is_edit'] = True
         
+        for query in connection.queries:
+            print(query['sql'])
         return context
     
     def form_valid(self, form):
